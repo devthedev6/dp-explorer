@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "eslint.config.js",
+    "lint-staged.config.js",
+    "vitest.workspace.ts",
+    "packages/*/src/**/*.ts",
+    "packages/*/test/**/*.ts",
+    "packages/*/vitest.config.ts",
+    "apps/web/src/**/*.ts",
+    "apps/web/src/**/*.tsx",
+    "apps/web/test/**/*.ts",
+    "apps/web/test/**/*.tsx",
+    "apps/web/vite.config.ts",
+    "apps/web/vitest.config.ts",
+    "apps/web/tailwind.config.ts",
+    "apps/web/postcss.config.js"
+  ]
+}

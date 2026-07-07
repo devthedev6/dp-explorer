@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react-jsx",
+    "outDir": "dist-types",
+    "rootDir": "src",
+    "tsBuildInfoFile": "dist-types/web.tsbuildinfo",
+    "types": ["vite/client", "vitest/globals"]
+  },
+  "include": [],
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/playback" },
+    { "path": "../../packages/templates" }
+  ]
+}

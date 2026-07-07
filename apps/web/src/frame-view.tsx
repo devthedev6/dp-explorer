@@ -1,6 +1,7 @@
 import type { ExecutionFrame } from "@dp-explorer/playback";
 
 import { DPTable } from "./dp-table";
+import { RecursionTreeView } from "./recursion-tree";
 
 export interface FrameViewProps {
   readonly frame: ExecutionFrame;
@@ -40,6 +41,10 @@ export function FrameView({ frame }: FrameViewProps) {
             frame.callStack.map((state, index) => <li key={`${state}-${index}`}>{state}</li>)
           )}
         </ul>
+      </section>
+
+      <section>
+        <RecursionTreeView frame={frame} />
       </section>
 
       <section>

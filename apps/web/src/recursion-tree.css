@@ -1,0 +1,67 @@
+.recursion-tree-panel {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 16px;
+}
+
+.recursion-tree-panel h2 {
+  margin: 0 0 12px;
+}
+
+.recursion-tree,
+.recursion-tree-children {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recursion-tree-children {
+  margin-left: 18px;
+  padding-left: 14px;
+  border-left: 2px solid #334155;
+}
+
+.recursion-tree-item {
+  margin: 0;
+  padding: 6px 0 0;
+}
+
+.recursion-tree-node {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid #334155;
+  background: #111827;
+  font:
+    0.85rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+
+.recursion-tree-node[data-completed="true"] {
+  color: #94a3b8;
+  background: #1e293b;
+  border-color: #475569;
+}
+
+.recursion-tree-node[data-active-branch="true"] {
+  border-color: #f97316;
+}
+
+.recursion-tree-node[data-active="true"] {
+  color: #f8fafc;
+  background: #f97316;
+}
+
+.recursion-tree-state {
+  font-weight: 700;
+}
+
+.recursion-tree-meta {
+  color: inherit;
+  opacity: 0.85;
+}

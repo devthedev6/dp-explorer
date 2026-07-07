@@ -1,0 +1,27 @@
+.playback-timeline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.playback-timeline-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.playback-timeline-slider {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.playback-timeline-position {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  color: #374151;
+  white-space: nowrap;
+}

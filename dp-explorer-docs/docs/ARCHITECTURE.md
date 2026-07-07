@@ -140,7 +140,9 @@ field-derivation rules.
 Receives the current `ExecutionFrame` from the Playback Engine and renders:
 
 - **DP table** (1D and 2D — dimension count comes from
-  `trace.dimensions.length`)
+  `frame.table.dimensions.length`; the Playback Engine copies this table
+  metadata from the trace into each frame so the Visualization Layer never
+  reads `ExecutionTrace` directly)
 - **Recursion tree** (top-down mode only — `frame.recursionTree` is `null` in
   bottom-up mode, so this panel is hidden)
 - **Explanation panel** — template-driven: a static map of explanation

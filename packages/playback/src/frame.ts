@@ -17,6 +17,17 @@ export interface HighlightedCell {
 }
 
 /**
+ * Metadata required by generic DP table renderers.
+ *
+ * This is copied from the trace into each frame so the visualization layer can
+ * render unknown cells without reading `ExecutionTrace` directly.
+ */
+export interface DPTableMetadata {
+  readonly stateVariables: readonly string[];
+  readonly dimensions: readonly number[];
+}
+
+/**
  * Resolved outcome for a recursion-tree call node.
  */
 export type RecursionNodeOutcome = "return" | "memo-hit" | "base-case";
@@ -53,6 +64,7 @@ export interface RecursionTree {
 export interface ExecutionFrame {
   readonly frameIndex: number;
   readonly currentEvent: TraceEvent;
+  readonly table: DPTableMetadata;
   readonly dpSnapshot: ReadonlyMap<StateKey, number>;
   readonly callStack: readonly StateKey[];
   readonly recursionTree: RecursionTree | null;

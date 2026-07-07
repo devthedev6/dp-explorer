@@ -143,6 +143,9 @@ describe("createPlaybackController", () => {
 
     expect(Object.isFrozen(controller)).toBe(true);
     expect(Object.isFrozen(frame)).toBe(true);
+    expect(Object.isFrozen(frame.table)).toBe(true);
+    expect(Object.isFrozen(frame.table.dimensions)).toBe(true);
+    expect(Object.isFrozen(frame.table.stateVariables)).toBe(true);
     expect(Object.isFrozen(frame.callStack)).toBe(true);
     expect(Object.isFrozen(frame.highlightedCells)).toBe(true);
     expect(Object.isFrozen(frame.resolvedDependencies)).toBe(true);

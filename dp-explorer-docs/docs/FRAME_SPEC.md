@@ -22,6 +22,12 @@ interface ExecutionFrame {
   currentEvent: TraceEvent;
 
   /**
+   * Metadata required to render generic DP tables without reading
+   * ExecutionTrace directly.
+   */
+  table: DPTableMetadata;
+
+  /**
    * All DP cells filled so far, keyed by StateKey.
    * Updated by both WRITE events and BASE_CASE events (see Derivation Rules).
    */
@@ -87,6 +93,13 @@ interface HighlightedCell {
   role: "active" | "dependency" | "memo-hit" | "base-case";
 }
 
+interface DPTableMetadata {
+  /** Axis names, copied from ExecutionTrace.stateVariables. */
+  stateVariables: readonly string[];
+  /** Axis sizes for this concrete input, copied from ExecutionTrace.dimensions. */
+  dimensions: readonly number[];
+}
+
 interface RecursionTree {
   /** All call nodes seen up to frameIndex, keyed by CALL event id. */
   nodes: ReadonlyMap<number, RecursionNode>;
@@ -130,6 +143,20 @@ Replay `WRITE` events **and** `BASE_CASE` events. Both update the snapshot:
 `BASE_CASE` in the snapshot rule keeps table rendering consistent across both
 execution modes: a base-case cell is "filled" at the moment its `BASE_CASE`
 event fires.
+
+### `table`
+
+Copy immutable table metadata from the trace:
+
+- `stateVariables = trace.stateVariables`
+- `dimensions = trace.dimensions`
+
+**Rationale.** The Visualization Layer renders exclusively from
+`ExecutionFrame` and never reads `ExecutionTrace` directly. Generic DP table
+rendering needs to know the full state-space dimensions so it can render both
+computed cells and unknown/uncomputed cells. Carrying this lightweight metadata
+in the frame preserves that boundary without adding algorithmic responsibility
+to the UI.
 
 ### `callStack`
 

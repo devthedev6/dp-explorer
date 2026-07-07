@@ -42,6 +42,10 @@ export function buildExecutionFrame(trace: ExecutionTrace, frameIndex: number): 
   return freezeFrame({
     frameIndex: clampedIndex,
     currentEvent,
+    table: Object.freeze({
+      stateVariables: Object.freeze([...trace.stateVariables]),
+      dimensions: Object.freeze([...trace.dimensions])
+    }),
     dpSnapshot: freezeReadonlyMap(replay.dpSnapshot),
     callStack: Object.freeze([...replay.callStackStates]),
     recursionTree,

@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint";
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 export default tseslint.config(
   {
-    ignores: ["**/dist/**", "**/coverage/**", "**/node_modules/**"]
+    ignores: ["**/dist/**", "**/dist-types/**", "**/coverage/**", "**/node_modules/**"]
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,

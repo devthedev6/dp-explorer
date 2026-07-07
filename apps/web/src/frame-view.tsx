@@ -1,5 +1,7 @@
 import type { ExecutionFrame } from "@dp-explorer/playback";
 
+import { DPTable } from "./dp-table";
+
 export interface FrameViewProps {
   readonly frame: ExecutionFrame;
 }
@@ -41,10 +43,7 @@ export function FrameView({ frame }: FrameViewProps) {
       </section>
 
       <section>
-        <h2>DP snapshot</h2>
-        <pre data-testid="dp-snapshot">
-          {JSON.stringify(Object.fromEntries(frame.dpSnapshot.entries()), null, 2)}
-        </pre>
+        <DPTable frame={frame} />
       </section>
     </section>
   );

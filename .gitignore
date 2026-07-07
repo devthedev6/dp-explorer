@@ -3,5 +3,6 @@ dist/
 dist-types/
 coverage/
 *.tsbuildinfo
+*.log
 .env
 .env.*

@@ -10,7 +10,7 @@
     "tsBuildInfoFile": "dist-types/web.tsbuildinfo",
     "types": ["vite/client", "vitest/globals"]
   },
-  "include": [],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [
     { "path": "../../packages/core" },
     { "path": "../../packages/playback" },

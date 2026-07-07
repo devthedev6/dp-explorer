@@ -9,6 +9,6 @@
     "rootDir": "src",
     "tsBuildInfoFile": "dist/templates.tsbuildinfo"
   },
-  "include": [],
+  "include": ["src/**/*.ts"],
   "references": [{ "path": "../core" }]
 }

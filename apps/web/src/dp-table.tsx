@@ -1,6 +1,8 @@
 import type { ExecutionFrame, HighlightRole } from "@dp-explorer/playback";
 import { toStateKey } from "@dp-explorer/core";
 
+import "./dp-table.css";
+
 export interface DPTableProps {
   readonly frame: ExecutionFrame;
 }
@@ -30,7 +32,7 @@ export function DPTable({ frame }: DPTableProps) {
   }
 
   return (
-    <section aria-label="DP table">
+    <section aria-label="DP table" className="dp-table-panel">
       <h2>DP table</h2>
       <p data-testid="dp-table-unsupported">Only 1D and 2D DP tables are supported.</p>
     </section>
@@ -43,28 +45,31 @@ function OneDimensionalTable({ frame }: DPTableProps) {
   const cells = Array.from({ length: size }, (_, index) => cellFor(frame, [index]));
 
   return (
-    <section aria-label="DP table">
+    <section aria-label="DP table" className="dp-table-panel">
       <h2>DP table</h2>
-      <table>
-        <thead>
-          <tr>
-            <th scope="row">{axis}</th>
-            {cells.map((cell) => (
-              <th key={cell.state} scope="col">
-                {cell.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">value</th>
-            {cells.map((cell) => (
-              <DPCell key={cell.state} cell={cell} />
-            ))}
-          </tr>
-        </tbody>
-      </table>
+      <div className="dp-table-scroll">
+        <table className="dp-table">
+          <thead>
+            <tr>
+              <th scope="row">{axis}</th>
+              {cells.map((cell) => (
+                <th key={cell.state} scope="col">
+                  {cell.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">value</th>
+              {cells.map((cell) => (
+                <DPCell key={cell.state} cell={cell} />
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <DPTableLegend />
     </section>
   );
 }
@@ -78,32 +83,35 @@ function TwoDimensionalTable({ frame }: DPTableProps) {
   const rows = Array.from({ length: rowCount }, (_, row) => row);
 
   return (
-    <section aria-label="DP table">
+    <section aria-label="DP table" className="dp-table-panel">
       <h2>DP table</h2>
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">{`${rowAxis}\\${columnAxis}`}</th>
-            {columns.map((column) => (
-              <th key={column} scope="col">
-                {columnAxis}={column}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row}>
-              <th scope="row">
-                {rowAxis}={row}
-              </th>
+      <div className="dp-table-scroll">
+        <table className="dp-table">
+          <thead>
+            <tr>
+              <th scope="col">{`${rowAxis}\\${columnAxis}`}</th>
               {columns.map((column) => (
-                <DPCell key={`${row}-${column}`} cell={cellFor(frame, [row, column])} />
+                <th key={column} scope="col">
+                  {columnAxis}={column}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row}>
+                <th scope="row">
+                  {rowAxis}={row}
+                </th>
+                {columns.map((column) => (
+                  <DPCell key={`${row}-${column}`} cell={cellFor(frame, [row, column])} />
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <DPTableLegend />
     </section>
   );
 }
@@ -113,6 +121,7 @@ function DPCell({ cell }: { readonly cell: CellViewModel }) {
 
   return (
     <td
+      className="dp-table-cell"
       data-state={cell.state}
       data-status={status}
       data-role={cell.role ?? "none"}
@@ -120,6 +129,27 @@ function DPCell({ cell }: { readonly cell: CellViewModel }) {
     >
       {cell.value ?? "?"}
     </td>
+  );
+}
+
+function DPTableLegend() {
+  return (
+    <ul className="dp-table-legend" aria-label="DP table legend">
+      <LegendItem label="Active" role="active" />
+      <LegendItem label="Dependency" role="dependency" />
+      <LegendItem label="Base Case" role="base-case" />
+      <LegendItem label="Memo Hit" role="memo-hit" />
+      <LegendItem label="Unknown" role="unknown" />
+    </ul>
+  );
+}
+
+function LegendItem({ label, role }: { readonly label: string; readonly role: string }) {
+  return (
+    <li>
+      <span className="dp-table-legend-swatch" data-role={role} aria-hidden="true" />
+      {label}
+    </li>
   );
 }
 

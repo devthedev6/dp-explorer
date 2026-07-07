@@ -3,25 +3,15 @@ import type { ExecutionTrace } from "@dp-explorer/core";
 import type { ExecutionFrame } from "./frame";
 
 /**
- * User-facing playback transport status.
- *
- * Timing belongs to callers such as the web app; this status only describes
- * whether the current navigation state is advancing automatically.
- */
-export type PlaybackStatus = "playing" | "paused";
-
-/**
  * Immutable state owned by a playback controller or caller.
  *
- * It joins the trace, current frame, and navigation preferences without
- * executing algorithms or knowing any visualization framework.
+ * It joins the trace, current index, and current frame without timers,
+ * transport status, UI lifecycle, or visualization concerns.
  */
 export interface PlaybackState {
   readonly trace: ExecutionTrace;
   readonly currentIndex: number;
   readonly frame: ExecutionFrame;
-  readonly status: PlaybackStatus;
-  readonly speed: number;
 }
 
 /**

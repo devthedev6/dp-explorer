@@ -9,6 +9,6 @@
     "rootDir": "src",
     "tsBuildInfoFile": "dist/core.tsbuildinfo"
   },
-  "include": [],
+  "include": ["src/**/*.ts"],
   "references": []
 }

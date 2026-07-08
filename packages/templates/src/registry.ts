@@ -4,6 +4,7 @@ import { longestCommonSubsequenceSpec } from "./longest-common-subsequence";
 import { editDistanceSpec } from "./edit-distance";
 import { knapsackSpec } from "./knapsack";
 import { uniquePathsIISpec } from "./unique-paths-ii";
+import { minimumPathSumSpec } from "./minimum-path-sum";
 
 export interface RegisteredTemplate {
   readonly id: string;
@@ -73,4 +74,19 @@ templateRegistry.register({
   name: uniquePathsIISpec.name,
   spec: uniquePathsIISpec as ProblemSpec<unknown>,
   defaultInput: { rows: 3, columns: 3, blocked: "1,1\n2,0" }
+});
+
+templateRegistry.register({
+  id: minimumPathSumSpec.id,
+  name: minimumPathSumSpec.name,
+  spec: minimumPathSumSpec as ProblemSpec<unknown>,
+  defaultInput: {
+    rows: 3,
+    columns: 3,
+    grid: [
+      [1, 3, 1],
+      [1, 5, 1],
+      [4, 2, 1]
+    ]
+  }
 });

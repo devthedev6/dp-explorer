@@ -66,7 +66,44 @@ function normalizeInput(
     };
   }
 
+  if (templateId === "minimum-path-sum") {
+    const rows = expectInteger(input.rows, "rows");
+    const columns = expectInteger(input.columns, "columns");
+    const grid = expectNumberGrid(input.grid, rows, columns);
+
+    return {
+      ...input,
+      rows,
+      columns,
+      grid
+    };
+  }
+
   return input;
+}
+
+function expectNumberGrid(
+  value: unknown,
+  rows: number,
+  columns: number
+): readonly (readonly number[])[] {
+  if (!Array.isArray(value) || value.length !== rows) {
+    throw new Error(`Grid must have exactly ${rows} rows.`);
+  }
+
+  for (const row of value) {
+    if (!Array.isArray(row) || row.length !== columns) {
+      throw new Error(`Each grid row must have exactly ${columns} columns.`);
+    }
+
+    for (const cell of row) {
+      if (typeof cell !== "number" || !Number.isFinite(cell) || cell < 0) {
+        throw new Error("Grid values must be non-negative finite numbers.");
+      }
+    }
+  }
+
+  return value as readonly (readonly number[])[];
 }
 
 function expectInteger(value: unknown, name: string): number {

@@ -51,12 +51,53 @@
   box-sizing: border-box;
 }
 
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
 .input-hint {
   display: block;
   margin-top: 4px;
   font-size: 0.875rem;
   color: #6b7280;
   line-height: 1.4;
+}
+
+.input-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.875rem;
+  color: #dc2626;
+}
+
+.grid-input {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+}
+
+.grid-input-row {
+  display: flex;
+  gap: 4px;
+}
+
+.grid-input-cell {
+  width: 64px;
+  padding: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1rem;
 }
 
 .app-problem-statement {

@@ -30,6 +30,99 @@ export function App() {
   const [frame, setFrame] = useState<ExecutionFrame>(() => session.currentFrame());
   const selectedTemplate = templateRegistry.get(selectedTemplateId) ?? defaultTemplate;
 
+  function isGridTemplateId(templateId: string): boolean {
+    return templateId === "unique-paths-ii" || templateId === "minimum-path-sum";
+  }
+
+  function ensureGridDimensions(
+    templateId: string,
+    nextInput: Record<string, unknown>,
+    forceResize = false
+  ): Record<string, unknown> {
+    if (!isGridTemplateId(templateId)) {
+      return nextInput;
+    }
+
+    const rows = typeof nextInput.rows === "number" ? nextInput.rows : 0;
+    const columns = typeof nextInput.columns === "number" ? nextInput.columns : 0;
+    const existingGrid = Array.isArray(nextInput.grid) ? nextInput.grid : [];
+
+    if (
+      !forceResize &&
+      existingGrid.length === rows &&
+      existingGrid.every((row) => Array.isArray(row) && row.length === columns)
+    ) {
+      return nextInput;
+    }
+
+    const grid: number[][] = [];
+
+    for (let i = 0; i < rows; i += 1) {
+      const row: number[] = [];
+      const existingRow = Array.isArray(existingGrid[i]) ? (existingGrid[i] as number[]) : [];
+
+      for (let j = 0; j < columns; j += 1) {
+        const existingCell = existingRow[j];
+        if (typeof existingCell === "number") {
+          row.push(existingCell);
+        } else {
+          row.push(0);
+        }
+      }
+
+      grid.push(row);
+    }
+
+    return { ...nextInput, grid };
+  }
+
+  function isInputValid(templateId: string, nextInput: Record<string, unknown>): boolean {
+    if (!isGridTemplateId(templateId)) {
+      return true;
+    }
+
+    const rows = typeof nextInput.rows === "number" ? nextInput.rows : 0;
+    const columns = typeof nextInput.columns === "number" ? nextInput.columns : 0;
+
+    if (!Number.isInteger(rows) || !Number.isInteger(columns) || rows < 1 || columns < 1) {
+      return false;
+    }
+
+    const grid = Array.isArray(nextInput.grid) ? nextInput.grid : [];
+
+    if (grid.length !== rows || grid.some((row) => !Array.isArray(row) || row.length !== columns)) {
+      return false;
+    }
+
+    if (
+      templateId === "minimum-path-sum" &&
+      grid.some(
+        (row: unknown) =>
+          Array.isArray(row) &&
+          (row as number[]).some(
+            (cell: number) => typeof cell !== "number" || !Number.isFinite(cell) || cell < 0
+          )
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      templateId === "unique-paths-ii" &&
+      grid.some(
+        (row: unknown) =>
+          Array.isArray(row) &&
+          (row as number[]).some(
+            (cell: number) => typeof cell !== "number" || !Number.isFinite(cell)
+          )
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   function startSession(template: RegisteredTemplate, nextInput: Record<string, unknown>) {
     const nextSession = createDemoSession({ ...template, defaultInput: nextInput });
     setSession(nextSession);
@@ -43,15 +136,24 @@ export function App() {
     }
 
     const nextInput = { ...template.defaultInput };
+    const normalizedInput = ensureGridDimensions(template.id, nextInput);
     setSelectedTemplateId(id);
-    setInput(nextInput);
-    startSession(template, nextInput);
+    setInput(normalizedInput);
+    startSession(template, normalizedInput);
   }
 
   function updateInputValue(name: string, value: unknown) {
     const nextInput = { ...input, [name]: value };
-    setInput(nextInput);
-    startSession(selectedTemplate, nextInput);
+    const normalizedInput = ensureGridDimensions(
+      selectedTemplate.id,
+      nextInput,
+      name === "rows" || name === "columns"
+    );
+    setInput(normalizedInput);
+
+    if (isInputValid(selectedTemplate.id, normalizedInput)) {
+      startSession(selectedTemplate, normalizedInput);
+    }
   }
 
   return (
@@ -193,6 +295,18 @@ function InputFieldControl({ field, value, onChange }: InputFieldControlProps) {
     );
   }
 
+  if (field.name === "grid" && field.description?.includes("grid")) {
+    const gridValue = Array.isArray(value) ? (value as number[][]) : [];
+
+    return (
+      <GridInputControl
+        value={gridValue}
+        label={field.label}
+        onChange={(nextGrid) => onChange(nextGrid)}
+      />
+    );
+  }
+
   if (field.type === "string") {
     if (field.name === "blocked" && field.description?.includes("coordinate")) {
       return (
@@ -242,5 +356,64 @@ function InputFieldControl({ field, value, onChange }: InputFieldControlProps) {
         value={typeof value == "string" || typeof value == "number" ? String(value) : ""}
       />
     </label>
+  );
+}
+
+interface GridInputControlProps {
+  readonly value: readonly (readonly number[])[];
+  readonly label: string;
+  readonly onChange: (value: number[][]) => void;
+}
+
+function GridInputControl({ value, label, onChange }: GridInputControlProps) {
+  function parseCellValue(rawValue: string): number {
+    const trimmed = rawValue.trim();
+
+    if (trimmed === "") {
+      return Number.NaN;
+    }
+
+    const parsed = Number(trimmed);
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  }
+
+  function updateCell(rowIndex: number, columnIndex: number, rawValue: string) {
+    const parsed = parseCellValue(rawValue);
+    const nextValue = value.map((row) => [...row]);
+
+    if (nextValue[rowIndex] === undefined) {
+      nextValue[rowIndex] = [];
+    }
+
+    nextValue[rowIndex][columnIndex] = parsed;
+    onChange(nextValue);
+  }
+
+  const hasInvalidCells = value.some((row) => row.some((cell) => !Number.isFinite(cell)));
+
+  return (
+    <div className="input-group">
+      <span className="input-label">{label}</span>
+      <div className="grid-input" aria-label="Grid values">
+        {value.map((row, rowIndex) => (
+          <div key={rowIndex} className="grid-input-row">
+            {row.map((cell, columnIndex) => (
+              <input
+                key={columnIndex}
+                type="number"
+                min={0}
+                value={Number.isFinite(cell) ? cell : ""}
+                onChange={(event) => updateCell(rowIndex, columnIndex, event.target.value)}
+                className="grid-input-cell"
+                aria-label={`Cell (${rowIndex}, ${columnIndex})`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      {hasInvalidCells && (
+        <span className="input-error">All grid cells must contain a non-negative number.</span>
+      )}
+    </div>
   );
 }

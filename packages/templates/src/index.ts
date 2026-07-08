@@ -3,4 +3,5 @@ export * from "./longest-common-subsequence";
 export * from "./edit-distance";
 export * from "./knapsack";
 export * from "./unique-paths-ii";
+export * from "./minimum-path-sum";
 export * from "./registry";

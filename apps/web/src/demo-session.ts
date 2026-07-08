@@ -2,6 +2,7 @@ import { runTopDown } from "@dp-explorer/core";
 import type { ExecutionFrame, PlaybackController } from "@dp-explorer/playback";
 import { createPlaybackController } from "@dp-explorer/playback";
 import type { RegisteredTemplate } from "@dp-explorer/templates";
+import { coordinateKey } from "@dp-explorer/templates";
 
 export interface DemoSession {
   readonly controller: PlaybackController;
@@ -35,24 +36,80 @@ function normalizeInput(
   templateId: string,
   input: Readonly<Record<string, unknown>>
 ): Readonly<Record<string, unknown>> {
-  if (templateId !== "knapsack") {
-    return input;
+  if (templateId === "knapsack") {
+    const weights = parseIntegerArray(input.weights);
+    const values = parseIntegerArray(input.values);
+
+    if (weights.length !== values.length) {
+      throw new Error(
+        `Weights and values must have the same length. Received ${weights.length} weights and ${values.length} values.`
+      );
+    }
+
+    return {
+      ...input,
+      weights,
+      values
+    };
   }
 
-  const weights = parseIntegerArray(input.weights);
-  const values = parseIntegerArray(input.values);
+  if (templateId === "unique-paths-ii") {
+    const rows = expectInteger(input.rows, "rows");
+    const columns = expectInteger(input.columns, "columns");
+    const blocked = parseBlockedCells(input.blocked, rows, columns);
 
-  if (weights.length !== values.length) {
-    throw new Error(
-      `Weights and values must have the same length. Received ${weights.length} weights and ${values.length} values.`
-    );
+    return {
+      ...input,
+      rows,
+      columns,
+      blocked
+    };
   }
 
-  return {
-    ...input,
-    weights,
-    values
-  };
+  return input;
+}
+
+function expectInteger(value: unknown, name: string): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new Error(`${name} must be a finite number.`);
+  }
+
+  return value;
+}
+
+function parseBlockedCells(value: unknown, rows: number, columns: number): ReadonlySet<string> {
+  if (typeof value !== "string") {
+    return new Set();
+  }
+
+  const blocked = new Set<string>();
+  const lines = value
+    .trim()
+    .split(/\r?\n/)
+    .filter((line) => line.trim() !== "");
+
+  for (const line of lines) {
+    const parts = line.split(",").map((part) => part.trim());
+
+    if (parts.length !== 2) {
+      throw new Error(`Blocked cell coordinate must have two parts. Received: "${line}".`);
+    }
+
+    const row = Number(parts[0]);
+    const column = Number(parts[1]);
+
+    if (!Number.isInteger(row) || !Number.isInteger(column)) {
+      throw new Error(`Blocked cell coordinates must be integers. Received: "${line}".`);
+    }
+
+    if (row < 0 || row >= rows || column < 0 || column >= columns) {
+      throw new Error(`Blocked cell (${row},${column}) is outside the ${rows} × ${columns} grid.`);
+    }
+
+    blocked.add(coordinateKey(row, column));
+  }
+
+  return blocked;
 }
 
 function parseIntegerArray(value: unknown): readonly number[] {

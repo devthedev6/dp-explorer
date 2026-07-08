@@ -194,6 +194,31 @@ function InputFieldControl({ field, value, onChange }: InputFieldControlProps) {
   }
 
   if (field.type === "string") {
+    if (field.name === "blocked" && field.description?.includes("coordinate")) {
+      return (
+        <label>
+          {field.label}
+          <textarea
+            maxLength={field.maxLength}
+            value={typeof value === "string" ? value : ""}
+            onChange={(event) => onChange(event.target.value)}
+            rows={5}
+          />
+          <span className="input-hint">
+            One coordinate per line.
+            <br />
+            Example:
+            <br />
+            1,2
+            <br />
+            2,0
+            <br />
+            4,3
+          </span>
+        </label>
+      );
+    }
+
     return (
       <label>
         {field.label}

@@ -39,6 +39,26 @@
   padding: 12px;
 }
 
+.app-header textarea {
+  display: block;
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.input-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
 .app-problem-statement {
   border: 1px solid #e5e7eb;
   border-radius: 6px;

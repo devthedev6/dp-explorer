@@ -3,6 +3,7 @@ import { fibonacciSpec } from "./fibonacci";
 import { longestCommonSubsequenceSpec } from "./longest-common-subsequence";
 import { editDistanceSpec } from "./edit-distance";
 import { knapsackSpec } from "./knapsack";
+import { uniquePathsIISpec } from "./unique-paths-ii";
 
 export interface RegisteredTemplate {
   readonly id: string;
@@ -65,4 +66,11 @@ templateRegistry.register({
   name: knapsackSpec.name,
   spec: knapsackSpec as ProblemSpec<unknown>,
   defaultInput: { capacity: 7, weights: "1,3,4,5", values: "1,4,5,7" }
+});
+
+templateRegistry.register({
+  id: uniquePathsIISpec.id,
+  name: uniquePathsIISpec.name,
+  spec: uniquePathsIISpec as ProblemSpec<unknown>,
+  defaultInput: { rows: 3, columns: 3, blocked: "1,1\n2,0" }
 });

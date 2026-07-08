@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ExecutionFrame } from "@dp-explorer/playback";
-import type { InputField } from "@dp-explorer/core";
+import type { AlgorithmFormulation, InputField } from "@dp-explorer/core";
 import type { RegisteredTemplate } from "@dp-explorer/templates";
 import { templateRegistry } from "@dp-explorer/templates";
 
@@ -75,11 +75,7 @@ export function App() {
           </select>
         </label>
 
-        <section className="app-problem-statement" aria-label="Problem statement">
-          <h2>{selectedTemplate.spec.title ?? selectedTemplate.name}</h2>
-          <h3>Problem Statement</h3>
-          <p>{selectedTemplate.spec.description}</p>
-        </section>
+        <AlgorithmFormulationPanel formulation={selectedTemplate.spec.formulation} />
 
         <fieldset>
           <legend>Input</legend>
@@ -136,6 +132,49 @@ interface InputFieldControlProps {
   readonly field: InputField;
   readonly value: unknown;
   readonly onChange: (value: unknown) => void;
+}
+
+interface AlgorithmFormulationPanelProps {
+  readonly formulation: AlgorithmFormulation | undefined;
+}
+
+function AlgorithmFormulationPanel({ formulation }: AlgorithmFormulationPanelProps) {
+  if (!formulation) {
+    return null;
+  }
+
+  return (
+    <section className="app-formulation" aria-label="Algorithm formulation">
+      <h2>{formulation.title}</h2>
+
+      <div className="app-formulation-section">
+        <h3>Problem Statement</h3>
+        <p className="app-formulation-prose">{formulation.problemStatement}</p>
+      </div>
+
+      <div className="app-formulation-section">
+        <h3>DP State</h3>
+        <pre className="app-formulation-code">{formulation.stateDefinition}</pre>
+      </div>
+
+      <div className="app-formulation-section">
+        <h3>Base Cases</h3>
+        <pre className="app-formulation-code">{formulation.baseCases}</pre>
+      </div>
+
+      <div className="app-formulation-section">
+        <h3>Transition</h3>
+        <pre className="app-formulation-code">{formulation.transition}</pre>
+      </div>
+
+      <div className="app-formulation-section">
+        <h3>Complexity</h3>
+        <p className="app-formulation-prose">
+          Time: {formulation.timeComplexity} | Space: {formulation.spaceComplexity}
+        </p>
+      </div>
+    </section>
+  );
 }
 
 function InputFieldControl({ field, value, onChange }: InputFieldControlProps) {

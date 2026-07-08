@@ -64,6 +64,21 @@ export interface TransitionResult {
 }
 
 /**
+ * Human-readable DP algorithm formulation.
+ *
+ * This is display-only metadata consumed by template information panels.
+ */
+export interface AlgorithmFormulation {
+  readonly title: string;
+  readonly problemStatement: string;
+  readonly stateDefinition: string;
+  readonly baseCases: string;
+  readonly transition: string;
+  readonly timeComplexity: string;
+  readonly spaceComplexity: string;
+}
+
+/**
  * Declarative description of a DP problem.
  *
  * A `ProblemSpec` says what the state space, base cases, recurrence, iteration
@@ -74,6 +89,7 @@ export interface ProblemSpec<Input = unknown> {
   readonly name: string;
   readonly title?: string;
   readonly description?: string;
+  readonly formulation?: AlgorithmFormulation;
   readonly stateVariables: readonly string[];
   readonly inputSchema: readonly InputField[];
   dimensions(input: Input): readonly number[];

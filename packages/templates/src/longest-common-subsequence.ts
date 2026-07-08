@@ -19,6 +19,18 @@ export const longestCommonSubsequenceSpec: ProblemSpec<LongestCommonSubsequenceI
   title: "Longest Common Subsequence",
   description:
     "Given two strings, compute the length of their longest common subsequence. A subsequence preserves relative order but characters do not need to be contiguous.",
+  formulation: {
+    title: "Longest Common Subsequence",
+    problemStatement: "Given two strings, compute the length of their longest common subsequence.",
+    stateDefinition:
+      "dp[i][j] represents length of LCS between first i characters of first string and first j characters of second string.",
+    baseCases:
+      "If either string has length 0, there are no common characters. Therefore, dp[i][0]=dp[0][j]=0.",
+    transition:
+      "Current State: dp[i][j]\n\nIf the last characters of the two prefixes are equal,include that character and move to dp[i-1][j-1].\n\nOtherwise,compare:\n dp[i-1][j] and dp[i][j-1]\nand take the larger of the two values.",
+    timeComplexity: "O(nm)",
+    spaceComplexity: "O(nm)"
+  },
   stateVariables: ["i", "j"],
   inputSchema: [
     { name: "first", label: "First string", type: "string", maxLength: 8 },

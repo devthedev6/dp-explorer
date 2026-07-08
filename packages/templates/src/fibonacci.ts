@@ -16,6 +16,15 @@ export const fibonacciSpec: ProblemSpec<FibonacciInput> = {
   title: "Fibonacci Numbers",
   description:
     "Given an integer n, compute the nth Fibonacci number where F(0)=0, F(1)=1, and F(n)=F(n−1)+F(n−2).",
+  formulation: {
+    title: "Fibonacci Numbers",
+    problemStatement: "Given an integer n, compute the nth Fibonacci number.",
+    stateDefinition: "dp[n] = nth Fibonacci number.",
+    baseCases: "dp[0]=0\ndp[1]=1",
+    transition: "dp[n]=dp[n−1]+dp[n−2]",
+    timeComplexity: "O(n)",
+    spaceComplexity: "O(n)"
+  },
   stateVariables: ["i"],
   inputSchema: [{ name: "n", label: "n", type: "integer", min: 0, max: 20 }],
   dimensions: (input) => [input.n + 1],

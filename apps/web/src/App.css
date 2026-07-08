@@ -46,13 +46,15 @@
   background: #f9fafb;
 }
 
-.app-problem-statement h2 {
-  margin: 0 0 8px;
+.app-problem-statement h2,
+.app-formulation h2 {
+  margin: 0 0 12px;
   font-size: 1.25rem;
 }
 
-.app-problem-statement h3 {
-  margin: 0 0 8px;
+.app-problem-statement h3,
+.app-formulation h3 {
+  margin: 0 0 6px;
   font-size: 1rem;
   color: #374151;
 }
@@ -61,6 +63,40 @@
   margin: 0;
   color: #4b5563;
   line-height: 1.5;
+}
+
+.app-formulation {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  background: #f9fafb;
+  margin-bottom: 12px;
+}
+
+.app-formulation-section {
+  margin-bottom: 10px;
+}
+
+.app-formulation-section:last-child {
+  margin-bottom: 0;
+}
+
+.app-formulation-prose {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.app-formulation-code {
+  margin: 0;
+  padding: 8px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  color: #111827;
+  white-space: pre-wrap;
 }
 
 .app-recursion-tree {

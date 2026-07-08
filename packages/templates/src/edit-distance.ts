@@ -20,6 +20,19 @@ export const editDistanceSpec: ProblemSpec<EditDistanceInput> = {
   title: "Edit Distance",
   description:
     "Given two strings, compute the minimum number of insertions, deletions, and replacements required to transform the first string into the second.",
+  formulation: {
+    title: "Edit Distance",
+    problemStatement:
+      "Given two strings, compute the minimum number of insertions, deletions, and replacements needed to transform one string into the other.",
+    stateDefinition:
+      "dp[i][j] represents the minimum number of operations required to convert the first i characters of the first string into the first j characters of the second string.",
+    baseCases:
+      "If the first string has length 0,we must use j insertions. Similarly, if the second string has length 0, we must use i insertions.\nHence dp[0][j]=j and dp[i][0]=i.",
+    transition:
+      "Current state: dp[i][j]\n\nIf the last characters of the two prefixes are equal, no new operation is needed. Move to dp[i-1][j-1].\n\nOtherwise, consider three possible operations:\n•Insert -> move to dp[i][j-1]\n•Delete -> move to dp[i-1][j]\n•Replace -> move to dp[i-1][j-1]\n\nChoose the operation with the minimum cost and add 1 for the current operation.",
+    timeComplexity: "O(nm)",
+    spaceComplexity: "O(nm)"
+  },
   stateVariables: ["i", "j"],
   inputSchema: [
     { name: "first", label: "First string", type: "string", maxLength: 8 },

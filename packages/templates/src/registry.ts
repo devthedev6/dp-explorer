@@ -2,6 +2,7 @@ import type { ProblemSpec } from "@dp-explorer/core";
 import { fibonacciSpec } from "./fibonacci";
 import { longestCommonSubsequenceSpec } from "./longest-common-subsequence";
 import { editDistanceSpec } from "./edit-distance";
+import { knapsackSpec } from "./knapsack";
 
 export interface RegisteredTemplate {
   readonly id: string;
@@ -57,4 +58,11 @@ templateRegistry.register({
   name: editDistanceSpec.name,
   spec: editDistanceSpec as ProblemSpec<unknown>,
   defaultInput: { first: "kitten", second: "sitting" }
+});
+
+templateRegistry.register({
+  id: knapsackSpec.id,
+  name: knapsackSpec.name,
+  spec: knapsackSpec as ProblemSpec<unknown>,
+  defaultInput: { capacity: 7, weights: "1,3,4,5", values: "1,4,5,7" }
 });

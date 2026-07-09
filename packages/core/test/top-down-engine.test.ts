@@ -31,7 +31,7 @@ const fibonacciSpec: ProblemSpec<FibonacciInput> = {
 
 describe("runTopDown", () => {
   it("generates the deterministic top-down Fibonacci trace in documented event order", () => {
-    const trace = runTopDown(fibonacciSpec, { n: 3 });
+    const { trace } = runTopDown(fibonacciSpec, { n: 3 });
 
     expect(trace).toStrictEqual({
       problemId: "fibonacci",
@@ -65,7 +65,7 @@ describe("runTopDown", () => {
   });
 
   it("records recursive call order and depth independently of visualization concerns", () => {
-    const calls = runTopDown(fibonacciSpec, { n: 3 }).events.filter(
+    const calls = runTopDown(fibonacciSpec, { n: 3 }).trace.events.filter(
       (event) => event.type === EventType.Call
     );
 
@@ -79,7 +79,7 @@ describe("runTopDown", () => {
   });
 
   it("emits memo hits for repeated states without recomputing their transition", () => {
-    const trace = runTopDown(fibonacciSpec, { n: 3 });
+    const { trace } = runTopDown(fibonacciSpec, { n: 3 });
     const memoHits = trace.events.filter((event) => event.type === EventType.MemoHit);
     const transitions = trace.events.filter((event) => event.type === EventType.Transition);
 
@@ -90,7 +90,7 @@ describe("runTopDown", () => {
   });
 
   it("keeps transition provenance tied to prior READ event ids", () => {
-    const trace = runTopDown(fibonacciSpec, { n: 3 });
+    const { trace } = runTopDown(fibonacciSpec, { n: 3 });
     const transitions = trace.events.filter((event) => event.type === EventType.Transition);
 
     for (const transition of transitions) {
@@ -104,7 +104,7 @@ describe("runTopDown", () => {
   });
 
   it("gives every CALL exactly one terminal event", () => {
-    const trace = runTopDown(fibonacciSpec, { n: 3 });
+    const { trace } = runTopDown(fibonacciSpec, { n: 3 });
     const terminalTypes = new Set<string>([
       EventType.MemoHit,
       EventType.BaseCase,
@@ -127,14 +127,14 @@ describe("runTopDown", () => {
   });
 
   it("produces identical traces for repeated executions", () => {
-    const first = runTopDown(fibonacciSpec, { n: 4 });
-    const second = runTopDown(fibonacciSpec, { n: 4 });
+    const first = runTopDown(fibonacciSpec, { n: 4 }).trace;
+    const second = runTopDown(fibonacciSpec, { n: 4 }).trace;
 
     expect(second).toStrictEqual(first);
   });
 
   it("freezes generated trace containers and event objects", () => {
-    const trace = runTopDown(fibonacciSpec, { n: 3 });
+    const { trace } = runTopDown(fibonacciSpec, { n: 3 });
     const firstEvent = trace.events[0];
     const transition = trace.events.find((event) => event.type === EventType.Transition);
 
@@ -158,11 +158,29 @@ describe("runTopDown", () => {
 
   it("snapshots input so later caller mutation does not change the trace", () => {
     const input = { n: 3 };
-    const trace = runTopDown(fibonacciSpec, input);
+    const { trace } = runTopDown(fibonacciSpec, input);
 
     input.n = 4;
 
     expect(trace.input).toEqual({ n: 3 });
+  });
+
+  it("returns a frozen execution result with the completed memo table", () => {
+    const result = runTopDown(fibonacciSpec, { n: 3 });
+
+    expect(Object.keys(result)).toEqual(["trace", "dpTable"]);
+    expect(Object.isFrozen(result)).toBe(true);
+    expect(Object.isFrozen(result.dpTable)).toBe(true);
+    expect(result.dpTable.size).toBe(4);
+    expect([...result.dpTable.entries()]).toEqual([
+      ["1", 1],
+      ["0", 0],
+      ["2", 1],
+      ["3", 2]
+    ]);
+    expect(result.dpTable.get("3")).toBe(2);
+    expect(result.dpTable.has("2")).toBe(true);
+    expect("set" in result.dpTable).toBe(false);
   });
 });
 

@@ -1,4 +1,6 @@
 import type { ProblemSpec } from "./problem-spec";
+import type { ExecutionResult } from "./execution-result";
+import { freezeDpTable } from "./execution-result";
 import type { StateCoordinates } from "./state-key";
 import { toStateKey } from "./state-key";
 import type { ExecutionTrace } from "./trace";
@@ -17,7 +19,7 @@ interface EvaluationResult {
  * The engine is generic: it knows how to walk states, memoize values, and emit
  * events, but it has no knowledge of any particular DP problem or UI concern.
  */
-export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): ExecutionTrace<Input> {
+export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): ExecutionResult<Input> {
   const events: TraceEvent[] = [];
   const memo = new Map<ReturnType<typeof toStateKey>, number>();
   let answerReadCount = 0;
@@ -153,13 +155,18 @@ export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): Execu
     answer
   });
 
-  return freezeTrace({
+  const trace = freezeTrace({
     problemId: spec.id,
     mode: "top-down",
     input: inputSnapshot,
     stateVariables: Object.freeze([...spec.stateVariables]),
     dimensions: Object.freeze([...spec.dimensions(input)]),
     events: Object.freeze([...events])
+  });
+
+  return Object.freeze({
+    trace,
+    dpTable: freezeDpTable(memo)
   });
 }
 

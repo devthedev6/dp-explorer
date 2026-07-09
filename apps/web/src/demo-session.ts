@@ -20,8 +20,8 @@ export interface DemoSession {
  */
 export function createDemoSession(template: RegisteredTemplate): DemoSession {
   const normalizedInput = normalizeInput(template.id, template.defaultInput);
-  const trace = runTopDown(template.spec, normalizedInput);
-  const controller = createPlaybackController(trace);
+  const result = runTopDown(template.spec, normalizedInput);
+  const controller = createPlaybackController(result.trace);
 
   return Object.freeze({
     controller,

@@ -1,4 +1,6 @@
 import type { ProblemSpec } from "./problem-spec";
+import type { ExecutionResult } from "./execution-result";
+import { freezeDpTable } from "./execution-result";
 import type { StateCoordinates } from "./state-key";
 import { toStateKey } from "./state-key";
 import type { ExecutionTrace } from "./trace";
@@ -13,7 +15,7 @@ import type { TraceEvent, TraceEventId } from "./trace";
  * every transition read, and emits the existing trace format consumed by
  * playback.
  */
-export function runBottomUp<Input>(spec: ProblemSpec<Input>, input: Input): ExecutionTrace<Input> {
+export function runBottomUp<Input>(spec: ProblemSpec<Input>, input: Input): ExecutionResult<Input> {
   const events: TraceEvent[] = [];
   const table = new Map<ReturnType<typeof toStateKey>, number>();
   let answerReadCount = 0;
@@ -130,13 +132,18 @@ export function runBottomUp<Input>(spec: ProblemSpec<Input>, input: Input): Exec
     answer
   });
 
-  return freezeTrace({
+  const trace = freezeTrace({
     problemId: spec.id,
     mode: "bottom-up",
     input: inputSnapshot,
     stateVariables: Object.freeze([...spec.stateVariables]),
     dimensions: Object.freeze([...spec.dimensions(input)]),
     events: Object.freeze([...events])
+  });
+
+  return Object.freeze({
+    trace,
+    dpTable: freezeDpTable(table)
   });
 }
 

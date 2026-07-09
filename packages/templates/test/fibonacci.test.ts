@@ -6,7 +6,7 @@ import { fibonacciSpec } from "../src";
 
 describe("fibonacciSpec", () => {
   it("type-checks and produces a trace through the generic top-down engine", () => {
-    const trace = runTopDown(fibonacciSpec, { n: 3 });
+    const { trace } = runTopDown(fibonacciSpec, { n: 3 });
 
     expect(trace.problemId).toBe("fibonacci");
     expect(trace.mode).toBe("top-down");

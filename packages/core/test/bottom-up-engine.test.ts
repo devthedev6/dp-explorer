@@ -31,7 +31,7 @@ const fibonacciSpec: ProblemSpec<FibonacciInput> = {
 
 describe("runBottomUp", () => {
   it("generates the deterministic bottom-up Fibonacci trace in documented event order", () => {
-    const trace = runBottomUp(fibonacciSpec, { n: 3 });
+    const { trace } = runBottomUp(fibonacciSpec, { n: 3 });
 
     expect(trace).toStrictEqual({
       problemId: "fibonacci",
@@ -74,7 +74,7 @@ describe("runBottomUp", () => {
   });
 
   it("emits no top-down-only events or call tree fields", () => {
-    const trace = runBottomUp(fibonacciSpec, { n: 3 });
+    const { trace } = runBottomUp(fibonacciSpec, { n: 3 });
     const eventTypes = trace.events.map((event) => event.type);
 
     expect(eventTypes).not.toContain(EventType.Call);
@@ -83,7 +83,7 @@ describe("runBottomUp", () => {
   });
 
   it("freezes generated trace containers and transition read ids", () => {
-    const trace = runBottomUp(fibonacciSpec, { n: 3 });
+    const { trace } = runBottomUp(fibonacciSpec, { n: 3 });
     const transition = trace.events.find((event) => event.type === EventType.Transition);
 
     expect(Object.isFrozen(trace)).toBe(true);
@@ -100,6 +100,24 @@ describe("runBottomUp", () => {
     expect(() => {
       (trace.events as TraceEvent[]).push(trace.events[0] as TraceEvent);
     }).toThrow(TypeError);
+  });
+
+  it("returns a frozen execution result with the completed tabulation table", () => {
+    const result = runBottomUp(fibonacciSpec, { n: 3 });
+
+    expect(Object.keys(result)).toEqual(["trace", "dpTable"]);
+    expect(Object.isFrozen(result)).toBe(true);
+    expect(Object.isFrozen(result.dpTable)).toBe(true);
+    expect(result.dpTable.size).toBe(4);
+    expect([...result.dpTable.entries()]).toEqual([
+      ["0", 0],
+      ["1", 1],
+      ["2", 1],
+      ["3", 2]
+    ]);
+    expect(result.dpTable.get("3")).toBe(2);
+    expect(result.dpTable.has("2")).toBe(true);
+    expect("set" in result.dpTable).toBe(false);
   });
 });
 

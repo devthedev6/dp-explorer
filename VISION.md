@@ -41,12 +41,12 @@ Prove that a single execution engine can visualize many different classes of Dyn
 - 0/1 Knapsack
 - Coin Change
 - Grid DP
-- Longest Increasing Subsequence
 - (Additional classical templates)
 
 At this stage, templates are implemented manually as ProblemSpec objects.
 
 The purpose of Version 1 is to validate the architecture.
+A known architecture limitation is that the current framework assumes a unique answer state.
 
 ---
 

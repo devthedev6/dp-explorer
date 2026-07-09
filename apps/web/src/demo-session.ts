@@ -79,7 +79,53 @@ function normalizeInput(
     };
   }
 
+  if (templateId === "coin-change") {
+    const coins = parseCoinDenominations(input.coins);
+    const target = expectNonNegativeInteger(input.target, "target");
+
+    return {
+      ...input,
+      coins,
+      target
+    };
+  }
+
   return input;
+}
+
+function parseCoinDenominations(value: unknown): readonly number[] {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new Error("Coins input cannot be empty.");
+  }
+
+  return value.split(",").map((part) => {
+    const trimmed = part.trim();
+
+    if (trimmed === "") {
+      throw new Error("Empty coin entry is not allowed.");
+    }
+
+    const parsed = Number(trimmed);
+
+    if (!Number.isInteger(parsed) || parsed <= 0) {
+      throw new Error(`Coin "${part}" must be a positive integer.`);
+    }
+
+    return parsed;
+  });
+}
+
+function expectNonNegativeInteger(value: unknown, name: string): number {
+  if (
+    typeof value !== "number" ||
+    !Number.isFinite(value) ||
+    !Number.isInteger(value) ||
+    value < 0
+  ) {
+    throw new Error(`${name} must be a non-negative integer.`);
+  }
+
+  return value;
 }
 
 function expectNumberGrid(

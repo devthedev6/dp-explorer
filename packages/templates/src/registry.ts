@@ -5,6 +5,7 @@ import { editDistanceSpec } from "./edit-distance";
 import { knapsackSpec } from "./knapsack";
 import { uniquePathsIISpec } from "./unique-paths-ii";
 import { minimumPathSumSpec } from "./minimum-path-sum";
+import { coinChangeSpec } from "./coin-change";
 
 export interface RegisteredTemplate {
   readonly id: string;
@@ -89,4 +90,11 @@ templateRegistry.register({
       [4, 2, 1]
     ]
   }
+});
+
+templateRegistry.register({
+  id: coinChangeSpec.id,
+  name: coinChangeSpec.name,
+  spec: coinChangeSpec as ProblemSpec<unknown>,
+  defaultInput: { coins: "1,3,4", target: 6 }
 });

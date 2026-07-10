@@ -16,5 +16,9 @@ export { createDefaultBuilderState } from "./builder-state";
 export { BuilderProvider, useBuilderState, useBuilderDispatch } from "./builder-store";
 export type { BuilderAction, BuilderStore } from "./builder-store";
 
+export { SymbolsEditor } from "./symbols-editor";
+export { StateEditor } from "./state-editor";
+export { BoundsEditor } from "./bounds-editor";
+
 export { BUILDER_STAGES, BUILDER_STAGE_IDS, findStageIndex } from "./builder-stages";
 export type { BuilderStageId, BuilderStage } from "./builder-stages";

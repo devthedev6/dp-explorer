@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react";
 import { BuilderProvider } from "./builder-store";
 import { BUILDER_STAGES, type BuilderStageId } from "./builder-stages";
+import { SymbolsEditor } from "./symbols-editor";
+import { StateEditor } from "./state-editor";
+import { BoundsEditor } from "./bounds-editor";
 
 import "./spec-builder.css";
 
@@ -123,7 +126,12 @@ function BuilderStageView({ stageId }: BuilderStageViewProps) {
   return (
     <div className="builder-stage-panel">
       <h2>{stage.title}</h2>
-      <p className="builder-placeholder">Forms for this stage will appear here.</p>
+      {stageId === "symbols" && <SymbolsEditor />}
+      {stageId === "state" && <StateEditor />}
+      {stageId === "bounds" && <BoundsEditor />}
+      {stageId !== "symbols" && stageId !== "state" && stageId !== "bounds" && (
+        <p className="builder-placeholder">Forms for this stage will appear here.</p>
+      )}
     </div>
   );
 }

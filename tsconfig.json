@@ -3,6 +3,7 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/playback" },
+    { "path": "./packages/spec-compiler" },
     { "path": "./packages/templates" },
     { "path": "./apps/web" }
   ]

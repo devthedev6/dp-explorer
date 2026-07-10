@@ -19,6 +19,7 @@
     "paths": {
       "@dp-explorer/core": ["packages/core/src"],
       "@dp-explorer/playback": ["packages/playback/src"],
+      "@dp-explorer/spec-compiler": ["packages/spec-compiler/src"],
       "@dp-explorer/templates": ["packages/templates/src"]
     }
   }

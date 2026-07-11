@@ -23,14 +23,14 @@ dp-explorer/
 
 Specification documents for each component:
 
-| Spec | Covers |
-|---|---|
-| `docs/PROBLEM_SPEC.md` | `ProblemSpec` interface and template authoring contract |
+| Spec                           | Covers                                                     |
+| ------------------------------ | ---------------------------------------------------------- |
+| `docs/PROBLEM_SPEC.md`         | `ProblemSpec` interface and template authoring contract    |
 | `docs/EXECUTION_TRACE_SPEC.md` | `TraceEvent` schema, event-sequence rules, worked examples |
-| `docs/PLAYBACK_SPEC.md` | `PlaybackController` behavioral contract |
-| `docs/FRAME_SPEC.md` | `ExecutionFrame` interface and field-derivation rules |
-| `docs/UI_SPEC.md` | Visualization layer layout, visual language, interactions |
-| `docs/CODEX_GUIDE.md` | Implementation conventions for contributors |
+| `docs/PLAYBACK_SPEC.md`        | `PlaybackController` behavioral contract                   |
+| `docs/FRAME_SPEC.md`           | `ExecutionFrame` interface and field-derivation rules      |
+| `docs/UI_SPEC.md`              | Visualization layer layout, visual language, interactions  |
+| `docs/CODEX_GUIDE.md`          | Implementation conventions for contributors                |
 
 ## Core Components
 
@@ -39,12 +39,13 @@ Specification documents for each component:
 A declarative description of a DP problem's state space, base cases, and
 recurrence — see `docs/PROBLEM_SPEC.md` for the full schema.
 
-Template authors supply *only* the math (dimensions, base case, transition,
+Template authors supply _only_ the math (dimensions, base case, transition,
 how to read the answer). They never write loops or recursion — the engine
 owns that, which is what keeps this an engine rather than a set of
 hand-animated demos.
 
 Eventually generated from (future, not MVP):
+
 - Built-in templates ← MVP scope
 - User-defined state descriptions
 - LLM
@@ -62,11 +63,12 @@ Two entry points, same spec:
 - `runBottomUp(spec, input): ExecutionTrace`
 
 Responsibilities:
+
 - Walk the state space (recursively or iteratively, per mode)
 - In bottom-up mode: check `baseCase` before calling `transition` for every
   state yielded by `iterationOrder`. Base-case states emit `BASE_CASE + WRITE`
   and bypass `transition`. Non-base states proceed through `READ* + TRANSITION
-  + WRITE`.
+  - WRITE`.
 - Instrument every `read()` call the spec makes, emitting trace events with
   full provenance
 - Validate bottom-up iteration order at runtime (a read of an unwritten cell
@@ -104,6 +106,7 @@ Engine a pure deterministic state machine.
 ### 5. Playback Engine (`packages/playback`)
 
 Responsible for:
+
 - Next / Previous / Seek
 
 A pure, deterministic state machine over `(trace, currentIndex)`. It never

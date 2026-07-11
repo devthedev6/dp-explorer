@@ -134,7 +134,7 @@ function normalizeStateVariables(
   dimensionCount: number
 ): BuilderStateVariable[] {
   const next = variables.slice(0, dimensionCount);
-  const names = ["i", "j", "k"];
+  const names = ["i", "j", "k", "l", "m"];
   while (next.length < dimensionCount) {
     next.push({
       name: names[next.length] ?? `v${next.length + 1}`,
@@ -144,6 +144,67 @@ function normalizeStateVariables(
     });
   }
   return next;
+}
+
+function clampDimensionCount(count: number): number {
+  return Math.min(5, Math.max(1, Math.floor(count)));
+}
+
+function normalizeRootStateExpression(builderState: BuilderState, dimensionCount: number): string {
+  const coordinates = readRootStateCoordinates(builderState.rootStateExpression);
+  const nextVariables = normalizeStateVariables(builderState.state.variables, dimensionCount);
+  const nextCoordinates = Array.from({ length: dimensionCount }, (_, index) => {
+    const existing = coordinates[index];
+    if (existing !== undefined && existing.trim() !== "") {
+      return existing;
+    }
+
+    const variable = nextVariables[index];
+    return variable?.upperBoundExpression.trim() || variable?.name || "0";
+  });
+
+  if (dimensionCount === 1) {
+    return nextCoordinates[0] ?? "0";
+  }
+
+  return `DP(${nextCoordinates.join(", ")})`;
+}
+
+function readRootStateCoordinates(expression: string): readonly string[] {
+  const trimmed = expression.trim();
+  const match = /^DP\s*\((.*)\)$/u.exec(trimmed);
+  if (match === null) {
+    return trimmed === "" ? [] : [trimmed];
+  }
+
+  return splitTopLevelCommaList(match[1] ?? "");
+}
+
+function splitTopLevelCommaList(value: string): readonly string[] {
+  const coordinates: string[] = [];
+  let depth = 0;
+  let current = "";
+
+  for (const char of value) {
+    if (char === "(" || char === "[" || char === "{") {
+      depth += 1;
+    } else if (char === ")" || char === "]" || char === "}") {
+      depth = Math.max(0, depth - 1);
+    }
+
+    if (char === "," && depth === 0) {
+      coordinates.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  if (current.trim() !== "" || value.trim() === "") {
+    coordinates.push(current.trim());
+  }
+
+  return coordinates;
 }
 
 function withBuilderState(builderState: BuilderState): BuilderReducerState {
@@ -180,15 +241,22 @@ function builderReducer(state: BuilderReducerState, action: BuilderAction): Buil
           symbol.id === action.id ? { ...symbol, ...action.updates } : symbol
         )
       });
-    case "SET_DIMENSION_COUNT":
-      return withBuilderState({
+    case "SET_DIMENSION_COUNT": {
+      const dimensionCount = clampDimensionCount(action.count);
+      const variables = normalizeStateVariables(state.builderState.state.variables, dimensionCount);
+      const nextState = {
         ...state.builderState,
         state: {
           ...state.builderState.state,
-          dimensionCount: action.count,
-          variables: normalizeStateVariables(state.builderState.state.variables, action.count)
+          dimensionCount,
+          variables
         }
+      };
+      return withBuilderState({
+        ...nextState,
+        rootStateExpression: normalizeRootStateExpression(nextState, dimensionCount)
       });
+    }
     case "SET_STATE_MEANING":
       return withBuilderState({
         ...state.builderState,

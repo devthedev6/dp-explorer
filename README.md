@@ -12,7 +12,7 @@ timeline, explanations) is derived purely from that trace. No UI code ever
 computes DP logic.
 
 Core idea: **State → Transition → Evaluation → Result** — and the engine can
-walk that abstraction in two different execution modes for the *same*
+walk that abstraction in two different execution modes for the _same_
 problem specification:
 
 - **Top-down** — memoized recursion (produces a call tree + memo hits)

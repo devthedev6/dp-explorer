@@ -86,7 +86,7 @@ interface ExecutionFrame {
 
 ```typescript
 type StateKey = string; // coordinates joined with commas, e.g. "3,7"
-                        // matches the serialisation used by the Execution Engine
+// matches the serialisation used by the Execution Engine
 
 interface HighlightedCell {
   state: StateKey;
@@ -161,6 +161,7 @@ to the UI.
 ### `callStack`
 
 Scan events in order:
+
 - `CALL` — push `state`
 - `RETURN` / `BASE_CASE` / `MEMO_HIT` — pop the top of the stack
 
@@ -197,16 +198,16 @@ recently pushed `StateKey` in `recursionTree.nodes` to retrieve its
 
 ### `highlightedCells`
 
-| `currentEvent.type` | Highlights produced |
-|---|---|
-| `CALL` | `active` — the called state |
-| `MEMO_HIT` | `memo-hit` — the hit state |
-| `BASE_CASE` | `base-case` — the base state |
-| `READ` | `dependency` — the read state |
-| `TRANSITION` | `active` — the computed state; `dependency` — every state in `resolvedDependencies` |
-| `WRITE` | `active` — the written state |
-| `RETURN` | `active` — the returned state |
-| `COMPLETE` | (empty — no per-cell highlight) |
+| `currentEvent.type` | Highlights produced                                                                 |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `CALL`              | `active` — the called state                                                         |
+| `MEMO_HIT`          | `memo-hit` — the hit state                                                          |
+| `BASE_CASE`         | `base-case` — the base state                                                        |
+| `READ`              | `dependency` — the read state                                                       |
+| `TRANSITION`        | `active` — the computed state; `dependency` — every state in `resolvedDependencies` |
+| `WRITE`             | `active` — the written state                                                        |
+| `RETURN`            | `active` — the returned state                                                       |
+| `COMPLETE`          | (empty — no per-cell highlight)                                                     |
 
 ### `resolvedDependencies`
 

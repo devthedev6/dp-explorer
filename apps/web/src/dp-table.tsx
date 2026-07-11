@@ -34,7 +34,12 @@ export function DPTable({ frame }: DPTableProps) {
   return (
     <section aria-label="DP table" className="dp-table-panel">
       <h2>DP table</h2>
-      <p data-testid="dp-table-unsupported">Only 1D and 2D DP tables are supported.</p>
+      <p data-testid="dp-table-unsupported">
+        Execution and playback are fully supported.
+        <br />
+        DP table visualization is currently available only for one- and two-dimensional dynamic
+        programming.
+      </p>
     </section>
   );
 }

@@ -1,6 +1,6 @@
 import { useBuilderDispatch, useBuilderState } from "./builder-store";
 
-const DIMENSION_OPTIONS = [1, 2, 3];
+const DIMENSION_OPTIONS = [1, 2, 3, 4, 5];
 
 export function StateEditor() {
   const state = useBuilderState();

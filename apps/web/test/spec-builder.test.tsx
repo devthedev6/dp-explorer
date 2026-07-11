@@ -147,6 +147,24 @@ describe("StateEditor", () => {
     expect(screen.getByTestId("state-probe").textContent).toContain("j");
   });
 
+  it("limits the Builder to five dimensions and synchronizes state variables", () => {
+    render(
+      <BuilderProvider>
+        <StateEditor />
+        <StateProbe />
+      </BuilderProvider>
+    );
+
+    const selector = screen.getByLabelText(/Number of DP dimensions/i);
+    expect(within(selector).getAllByRole("option")).toHaveLength(5);
+
+    fireEvent.change(selector, { target: { value: "5" } });
+
+    const nameInputs = screen.getAllByLabelText(/^State variable \d+ name$/i);
+    expect(nameInputs).toHaveLength(5);
+    expect(screen.getByTestId("state-probe").textContent).toContain("5D");
+  });
+
   it("updates state meaning", () => {
     render(
       <BuilderProvider>
@@ -178,6 +196,20 @@ describe("BoundsEditor", () => {
 
     expect(lowerBounds).toHaveLength(2);
     expect(upperBounds).toHaveLength(2);
+  });
+
+  it("synchronizes bound editors through five dimensions", () => {
+    render(
+      <BuilderProvider>
+        <StateEditor />
+        <BoundsEditor />
+      </BuilderProvider>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Number of DP dimensions/i), { target: { value: "5" } });
+
+    expect(screen.getAllByLabelText(/^Lower Bound$/i)).toHaveLength(5);
+    expect(screen.getAllByLabelText(/^Upper Bound$/i)).toHaveLength(5);
   });
 
   it("updates bounds through BuilderState", () => {
@@ -247,10 +279,28 @@ describe("RootStateEditor", () => {
       </BuilderProvider>
     );
 
-    fireEvent.change(screen.getByLabelText(/Root State Expression/i), {
-      target: { value: "DP(n, m)" }
+    fireEvent.change(screen.getByLabelText(/Root coordinate 1/i), {
+      target: { value: "n" }
     });
-    expect(screen.getByTestId("state-probe").textContent).toContain("DP(n, m)");
+    expect(screen.getByTestId("state-probe").textContent).toContain("n");
+  });
+
+  it("synchronizes root-state coordinate editors through five dimensions", () => {
+    render(
+      <BuilderProvider>
+        <StateEditor />
+        <RootStateEditor />
+        <StateProbe />
+      </BuilderProvider>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Number of DP dimensions/i), { target: { value: "5" } });
+    expect(screen.getAllByLabelText(/^Root coordinate \d+$/i)).toHaveLength(5);
+
+    fireEvent.change(screen.getByLabelText(/Root coordinate 5/i), {
+      target: { value: "m" }
+    });
+    expect(screen.getByTestId("state-probe").textContent).toContain("DP(n, j, k, l, m)");
   });
 });
 
@@ -375,6 +425,38 @@ describe("ReviewCompileStage", () => {
     fireEvent.click(screen.getByRole("button", { name: /^reset$/i }));
     expect(screen.getByTestId("timeline-position").textContent).toContain("1 /");
   });
+
+  it.each([1, 2, 3, 4, 5])(
+    "executes a compiled %dD ProblemSpec and presents supported playback",
+    (dimensionCount) => {
+      render(
+        <BuilderProvider initialState={createDimensionalBuilderState(dimensionCount)}>
+          <ReviewCompileStage />
+        </BuilderProvider>
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: /compile specification/i }));
+      fireEvent.click(screen.getByRole("button", { name: /run specification/i }));
+
+      const answerPanel = screen.getByLabelText(/execution answer/i);
+      expect(within(answerPanel).getByText("7")).toBeDefined();
+      expect(screen.getByTestId("recursion-tree")).toBeDefined();
+      expect(screen.getByText(/Current event/i)).toBeDefined();
+      expect(screen.getByTestId("timeline-position").textContent).toContain("1 /");
+
+      fireEvent.click(screen.getByRole("button", { name: /^next$/i }));
+      expect(screen.getByTestId("timeline-position").textContent).toContain("2 /");
+
+      if (dimensionCount <= 2) {
+        expect(screen.queryByTestId("dp-table-unsupported")).toBeNull();
+        expect(screen.getByRole("heading", { name: "DP table" })).toBeDefined();
+      } else {
+        expect(screen.getByTestId("dp-table-unsupported").textContent).toContain(
+          "Execution and playback are fully supported."
+        );
+      }
+    }
+  );
 });
 
 describe("ExpressionLanguageReference", () => {
@@ -485,6 +567,40 @@ function createCompilableBuilderState() {
     ],
     rootStateExpression: "DP(n)",
     answerExpression: "DP(n)",
+    executionMode: "top-down"
+  } as const;
+}
+
+function createDimensionalBuilderState(dimensionCount: number) {
+  const names = ["i", "j", "k", "l", "m"].slice(0, dimensionCount);
+  const zeroCoordinates = names.map(() => "0");
+
+  return {
+    metadata: {
+      name: `${dimensionCount}D Base DP`,
+      description: "Generated dimensional smoke-test specification"
+    },
+    symbols: [],
+    state: {
+      dimensionCount,
+      variables: names.map((name) => ({
+        name,
+        lowerBoundExpression: "0",
+        upperBoundExpression: "0"
+      })),
+      meaning: "dp state"
+    },
+    baseCases: [
+      {
+        id: "base-origin",
+        conditionExpression: names.map((name) => `${name} == 0`).join(" and "),
+        valueExpression: "7"
+      }
+    ],
+    transitions: [],
+    initialValueExpression: "0",
+    rootStateExpression: `DP(${zeroCoordinates.join(", ")})`,
+    answerExpression: `DP(${zeroCoordinates.join(", ")})`,
     executionMode: "top-down"
   } as const;
 }

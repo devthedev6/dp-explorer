@@ -17,10 +17,11 @@ expressed as state-space exploration.
 
 A declarative description of a problem.
 
-A ProblemSpec describes *what* the algorithm is mathematically, not *how* it is
+A ProblemSpec describes _what_ the algorithm is mathematically, not _how_ it is
 executed.
 
 It defines:
+
 - State variables
 - Base cases
 - Transition function
@@ -36,6 +37,7 @@ Template authors write only the ProblemSpec.
 A single subproblem.
 
 Examples:
+
 - dp[i]
 - dp[i][j]
 - dp[node][mask]
@@ -49,6 +51,7 @@ Every state has a unique StateKey.
 The canonical identifier for a state.
 
 Examples:
+
 - "5"
 - "3,7"
 - "4,12,9"
@@ -64,6 +67,7 @@ A rule describing how one state depends on other states.
 Example:
 
 dp[i][j] depends on
+
 - dp[i-1][j]
 - dp[i-1][j-weight]
 
@@ -76,6 +80,7 @@ Transitions define the dependency graph.
 A state whose value is known without evaluating transitions.
 
 Examples:
+
 - i == 0
 - j == 0
 - index == n
@@ -104,6 +109,7 @@ The ExecutionTrace is the single source of truth for all visualizations.
 One atomic event within an ExecutionTrace.
 
 Examples:
+
 - CALL
 - READ
 - WRITE
@@ -182,6 +188,7 @@ Colors communicate execution status rather than only stored values.
 Navigation through an ExecutionTrace.
 
 Supported actions include:
+
 - Next
 - Previous
 - Seek
@@ -195,6 +202,7 @@ Supported actions include:
 A built-in implementation of a ProblemSpec.
 
 Examples:
+
 - Fibonacci
 - 0/1 Knapsack
 - LCS
@@ -209,6 +217,7 @@ Templates define the mathematics; the engine performs the execution.
 The first production milestone.
 
 Supports:
+
 - Built-in templates
 - Top-down and bottom-up execution
 - Execution traces
@@ -218,6 +227,7 @@ Supports:
 - Explanation panel
 
 The MVP intentionally excludes:
+
 - Natural-language parsing
 - Code parsing
 - User accounts
@@ -231,15 +241,15 @@ The MVP intentionally excludes:
 The project follows one core principle:
 
 ProblemSpec
-    ↓
+↓
 Execution Engine
-    ↓
+↓
 ExecutionTrace
-    ↓
+↓
 Playback Engine
-    ↓
+↓
 ExecutionFrame
-    ↓
+↓
 Visualization
 
 Every new feature should fit naturally into this pipeline rather than bypass it.

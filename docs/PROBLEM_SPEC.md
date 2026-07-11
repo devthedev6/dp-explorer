@@ -74,8 +74,8 @@ interface InputField {
   label: string;
   type: "integer" | "integerArray" | "string" | "stringArray";
   min?: number;
-  max?: number;        // value bound
-  maxLength?: number;   // array length bound — keeps traces small enough to scrub smoothly
+  max?: number; // value bound
+  maxLength?: number; // array length bound — keeps traces small enough to scrub smoothly
   description?: string;
 }
 ```
@@ -87,9 +87,7 @@ const fibonacci: ProblemSpec<{ n: number }> = {
   id: "fibonacci",
   name: "Fibonacci",
   stateVariables: ["i"],
-  inputSchema: [
-    { name: "n", label: "n", type: "integer", min: 0, max: 20 },
-  ],
+  inputSchema: [{ name: "n", label: "n", type: "integer", min: 0, max: 20 }],
   dimensions: (input) => [input.n + 1],
   baseCase: (state) => {
     const [i] = state;
@@ -102,7 +100,7 @@ const fibonacci: ProblemSpec<{ n: number }> = {
   iterationOrder: function* (input) {
     for (let i = 0; i <= input.n; i++) yield [i];
   },
-  extractAnswer: (input, read) => read([input.n]),
+  extractAnswer: (input, read) => read([input.n])
 };
 ```
 
@@ -116,7 +114,7 @@ const knapsack: ProblemSpec<{ weights: number[]; values: number[]; capacity: num
   inputSchema: [
     { name: "weights", label: "Weights", type: "integerArray", maxLength: 12, min: 1 },
     { name: "values", label: "Values", type: "integerArray", maxLength: 12, min: 1 },
-    { name: "capacity", label: "Capacity", type: "integer", min: 0, max: 50 },
+    { name: "capacity", label: "Capacity", type: "integer", min: 0, max: 50 }
   ],
   dimensions: (input) => [input.weights.length + 1, input.capacity + 1],
   baseCase: (state) => {
@@ -134,10 +132,9 @@ const knapsack: ProblemSpec<{ weights: number[]; values: number[]; capacity: num
   },
   iterationOrder: function* (input) {
     for (let i = 0; i <= input.weights.length; i++)
-      for (let w = 0; w <= input.capacity; w++)
-        yield [i, w];
+      for (let w = 0; w <= input.capacity; w++) yield [i, w];
   },
-  extractAnswer: (input, read) => read([input.weights.length, input.capacity]),
+  extractAnswer: (input, read) => read([input.weights.length, input.capacity])
 };
 ```
 

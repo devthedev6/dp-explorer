@@ -53,6 +53,22 @@ describe("DPTable", () => {
     expect(html).toContain('data-role="dependency"');
     expect(html).toContain('aria-label="1,2: 5"');
   });
+
+  it("shows an informational message for higher-dimensional tables", () => {
+    const frame = createFrame({
+      dimensions: [1, 1, 1],
+      stateVariables: ["i", "j", "k"],
+      dpSnapshot: new Map([[toStateKey([0, 0, 0]), 7]]),
+      highlightedCells: [{ state: toStateKey([0, 0, 0]), role: "active" }]
+    });
+
+    const html = renderToStaticMarkup(<DPTable frame={frame} />);
+
+    expect(html).toContain("Execution and playback are fully supported.");
+    expect(html).toContain(
+      "DP table visualization is currently available only for one- and two-dimensional dynamic programming."
+    );
+  });
 });
 
 function createFrame({

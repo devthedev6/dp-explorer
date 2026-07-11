@@ -82,6 +82,7 @@ function usePlayback(trace: ExecutionTrace): {
 ```
 
 The hook:
+
 1. Creates the controller once via `useRef` (stable reference across renders).
 2. Manages a `isPlaying` boolean in React state.
 3. Runs a `useEffect` with `setInterval` (or `requestAnimationFrame`) that

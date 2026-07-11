@@ -32,7 +32,7 @@ The learner should understand:
 Every built-in problem can be watched in two execution modes without
 changing the underlying specification:
 
-- **Top-down (memoized recursion)** — shows *why* a state is needed, via a
+- **Top-down (memoized recursion)** — shows _why_ a state is needed, via a
   call tree. Good for building recursive intuition and seeing memoization
   fire.
 - **Bottom-up (tabulation)** — shows the table filling in dependency order.

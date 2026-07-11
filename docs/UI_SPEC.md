@@ -9,34 +9,44 @@
 
 ## Layout
 
--------------------------------------------------
+---
+
 Problem Description
 -------------------------------------------------
+
 Recursion Tree | DP Table
 -------------------------------------------------
+
 Explanation Panel
 -------------------------------------------------
+
 Timeline + Playback Controls
 -------------------------------------------------
 
 ## Visual Language
 
 Active recursion branch:
+
 - Orange / deep red glow
 
 Completed branch:
+
 - Soft green
 
 Pruned / dead branch:
+
 - Neutral gray
 
 Current state:
+
 - Bright highlight
 
 Memoization hit:
+
 - Purple accent
 
 Base case:
+
 - Blue accent
 
 The recursion tree should feel inspired by cinematic AI interfaces (Jarvis /

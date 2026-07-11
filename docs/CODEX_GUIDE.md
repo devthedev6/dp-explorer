@@ -11,6 +11,7 @@ Principles
 7. Do not bypass the Execution Trace.
 
 Every implementation task should begin by identifying:
+
 - Inputs
 - Outputs
 - Interfaces

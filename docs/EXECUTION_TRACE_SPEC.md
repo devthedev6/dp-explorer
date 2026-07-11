@@ -12,8 +12,8 @@ interface ExecutionTrace {
   problemId: string;
   mode: "top-down" | "bottom-up";
   input: unknown;
-  stateVariables: string[];   // e.g. ["i", "j"]
-  dimensions: number[];       // axis sizes for this concrete input
+  stateVariables: string[]; // e.g. ["i", "j"]
+  dimensions: number[]; // axis sizes for this concrete input
   events: TraceEvent[];
 }
 ```
@@ -124,6 +124,7 @@ reads only from a list like this.
 In bottom-up mode `CALL`, `MEMO_HIT`, and `RETURN` are never emitted.
 For each state yielded by `iterationOrder`, the engine checks `baseCase`
 first:
+
 - **Base-case state** — emit `BASE_CASE + WRITE`, skip `transition`.
 - **Non-base state** — call `transition` (emitting `READ` events per
   `ctx.read` call), then emit `TRANSITION + WRITE`.
@@ -146,6 +147,7 @@ COMPLETE   { id: 13, answer: 2 }
 ```
 
 Key differences from top-down:
+
 - No `CALL` / `MEMO_HIT` / `RETURN` events — there is no call stack.
 - `BASE_CASE` events appear and are immediately followed by `WRITE`.
   `parentId` is always `null` in bottom-up (there is no caller).
@@ -164,6 +166,7 @@ part of the pedagogical goal of the top-down visualization.
 needed, use the parent `CALL` event's `depth + 1`.
 
 For statistics:
+
 - `callCount` = number of `CALL` events. A call that resolves as a
   `MEMO_HIT` still counts (the call was made; it just returned from cache).
 - `memoHitCount` = number of `MEMO_HIT` events.

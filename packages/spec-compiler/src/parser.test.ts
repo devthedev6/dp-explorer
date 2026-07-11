@@ -19,6 +19,7 @@ describe("parseSpecification", () => {
     expect(result.parsedSpecification.parsedTransitionExpressions[0]?.ast.type).toBe(
       "OperatorNode"
     );
+    expect(result.parsedSpecification.parsedInitialValueExpression.ast.type).toBe("ConstantNode");
     expect(result.parsedSpecification.parsedRootState.ast.type).toBe("FunctionNode");
     expect(result.parsedSpecification.parsedAnswerExpression.ast.type).toBe("FunctionNode");
     expect(Object.isFrozen(result.parsedSpecification.parsedAnswerExpression.ast)).toBe(true);
@@ -110,6 +111,7 @@ function createBuilderState(): BuilderState {
         valueExpression: "DP(i - 1) + DP(i - 2)"
       }
     ],
+    initialValueExpression: "0",
     rootStateExpression: "DP(n)",
     answerExpression: "DP(n)",
     executionMode: "top-down"

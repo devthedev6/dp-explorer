@@ -36,6 +36,12 @@ export function generateProblemSpec(
     description: builderState.metadata.description,
     stateVariables,
     inputSchema: Object.freeze(builderState.symbols.flatMap(symbolToInputField)),
+    initialValue(input) {
+      return evaluateNumber(parsed.parsedInitialValueExpression.ast, {
+        input: asRuntimeInput(input),
+        constants
+      });
+    },
     dimensions(input) {
       const scope = {
         input: asRuntimeInput(input),

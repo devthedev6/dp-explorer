@@ -11,6 +11,7 @@ export type BuilderStageId =
   | "bounds"
   | "base-cases"
   | "transitions"
+  | "initial-value"
   | "root-state"
   | "answer"
   | "review-compile";
@@ -27,6 +28,7 @@ export const BUILDER_STAGES: readonly BuilderStage[] = [
   { id: "bounds", title: "Bounds", shortTitle: "Bounds" },
   { id: "base-cases", title: "Base Cases", shortTitle: "Base" },
   { id: "transitions", title: "Transitions", shortTitle: "Transitions" },
+  { id: "initial-value", title: "Initial DP Value", shortTitle: "Initial" },
   { id: "root-state", title: "Root State", shortTitle: "Root" },
   { id: "answer", title: "Answer", shortTitle: "Answer" },
   { id: "review-compile", title: "Review & Compile", shortTitle: "Review" }

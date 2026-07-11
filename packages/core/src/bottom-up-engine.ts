@@ -20,6 +20,14 @@ export function runBottomUp<Input>(spec: ProblemSpec<Input>, input: Input): Exec
   const events: TraceEvent[] = [];
   const table = new Map<ReturnType<typeof toStateKey>, number>();
   const inputSnapshot = deepFreeze(cloneInput(input));
+  const iterationStates = [...spec.iterationOrder(input)];
+
+  if (spec.initialValue !== undefined) {
+    const initialValue = spec.initialValue(input);
+    for (const state of iterationStates) {
+      table.set(toStateKey(state), initialValue);
+    }
+  }
 
   const nextId = (): TraceEventId => events.length;
 
@@ -45,7 +53,7 @@ export function runBottomUp<Input>(spec: ProblemSpec<Input>, input: Input): Exec
     return { stateKey, value };
   };
 
-  for (const state of spec.iterationOrder(input)) {
+  for (const state of iterationStates) {
     const stateKey = toStateKey(state);
     const baseCase = spec.baseCase(state, input);
 

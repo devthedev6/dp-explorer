@@ -67,6 +67,7 @@ export interface BuilderState {
   };
   readonly baseCases: readonly BuilderBaseCase[];
   readonly transitions: readonly BuilderTransition[];
+  readonly initialValueExpression?: string;
   readonly rootStateExpression: string;
   readonly answerExpression: string;
   readonly executionMode: ExecutionMode;
@@ -128,6 +129,7 @@ export function createDefaultBuilderState(): BuilderState {
         valueExpression: "dp(i - 1) + dp(i - 2)"
       }
     ],
+    initialValueExpression: "0",
     rootStateExpression: "n",
     answerExpression: "dp(n)",
     executionMode: "top-down"

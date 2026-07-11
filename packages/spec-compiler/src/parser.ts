@@ -96,6 +96,11 @@ function collectParseTargets(builderState: BuilderState): ParseTarget[] {
   });
 
   targets.push({
+    kind: "initial-value-expression",
+    expression: builderState.initialValueExpression ?? "0",
+    path: ["initialValueExpression"]
+  });
+  targets.push({
     kind: "root-state",
     expression: builderState.rootStateExpression,
     path: ["rootStateExpression"]
@@ -192,6 +197,7 @@ function createParsedSpecification(
       parsedTransitions.map((transition) => transition.value)
     ),
     parsedTransitions: Object.freeze(parsedTransitions),
+    parsedInitialValueExpression: getParsed(parsedByPath, ["initialValueExpression"]),
     parsedRootState: getParsed(parsedByPath, ["rootStateExpression"]),
     parsedAnswerExpression: getParsed(parsedByPath, ["answerExpression"])
   });

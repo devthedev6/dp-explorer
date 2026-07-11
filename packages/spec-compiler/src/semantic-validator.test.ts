@@ -59,6 +59,21 @@ describe("validateSpecification", () => {
     expectDiagnostics(result, ['Array "grid" expects 2 indices but received 1.']);
   });
 
+  it("allows primitive string indexing", () => {
+    const result = validateBuilderState({
+      ...createBuilderState(),
+      transitions: [
+        {
+          id: "transition-1",
+          conditionExpression: "word[i] == word[j]",
+          valueExpression: "len(word) + DP(i - 1, j)"
+        }
+      ]
+    });
+
+    expect(result.success).toBe(true);
+  });
+
   it("detects reserved keyword misuse", () => {
     const result = validateBuilderState({
       ...createBuilderState(),
@@ -231,6 +246,7 @@ function createBuilderState(): BuilderState {
         valueExpression: "max(DP(i - 1, j), DP(i, j - 1)) + grid[i][j] + bitXor(1, 2)"
       }
     ],
+    initialValueExpression: "0",
     rootStateExpression: "DP(n, n)",
     answerExpression: "DP(n, n)",
     executionMode: "bottom-up"

@@ -1,4 +1,10 @@
-import { runBottomUp, runTopDown, type ProblemSpec } from "@dp-explorer/core";
+import {
+  EventType,
+  runBottomUp,
+  runTopDown,
+  type ProblemSpec,
+  type TraceEvent
+} from "@dp-explorer/core";
 import type { ExecutionFrame, PlaybackController } from "@dp-explorer/playback";
 import { createPlaybackController } from "@dp-explorer/playback";
 import type { RegisteredTemplate } from "@dp-explorer/templates";
@@ -8,6 +14,7 @@ export type RuntimeExecutionMode = "top-down" | "bottom-up";
 
 export interface DemoSession {
   readonly controller: PlaybackController;
+  readonly answer: number;
   currentFrame(): ExecutionFrame;
   next(): ExecutionFrame;
   previous(): ExecutionFrame;
@@ -32,14 +39,27 @@ export function createProblemSpecSession<Input>(
 ): DemoSession {
   const result = mode === "bottom-up" ? runBottomUp(spec, input) : runTopDown(spec, input);
   const controller = createPlaybackController(result.trace);
+  const answer = readCompleteAnswer(result.trace.events);
 
   return Object.freeze({
     controller,
+    answer,
     currentFrame: () => controller.currentFrame(),
     next: () => controller.next(),
     previous: () => controller.previous(),
     reset: () => controller.seek(0)
   });
+}
+
+function readCompleteAnswer(events: readonly TraceEvent[]): number {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    if (event?.type === EventType.Complete) {
+      return event.answer;
+    }
+  }
+
+  throw new Error("Execution trace did not include a complete answer.");
 }
 
 function normalizeInput(

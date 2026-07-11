@@ -8,6 +8,7 @@ export type ParseExpressionKind =
   | "base-case-expression"
   | "transition-condition"
   | "transition-expression"
+  | "initial-value-expression"
   | "root-state"
   | "answer-expression";
 

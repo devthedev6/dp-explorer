@@ -181,46 +181,52 @@ export function ReviewCompileStage() {
           {executionError && <p className="builder-execution-error">{executionError}</p>}
 
           {execution && (
-            <section className="builder-playback" aria-label="Compiled specification playback">
-              <section className="builder-playback-tree" aria-label="Recursion tree">
-                <RecursionTreeView frame={execution.frame} />
+            <>
+              <section className="builder-answer-panel" aria-label="Execution answer">
+                <h4>Answer</h4>
+                <output>{execution.session.answer}</output>
               </section>
-              <section className="builder-playback-table" aria-label="DP table">
-                <DPTable frame={execution.frame} />
+              <section className="builder-playback" aria-label="Compiled specification playback">
+                <section className="builder-playback-tree" aria-label="Recursion tree">
+                  <RecursionTreeView frame={execution.frame} />
+                </section>
+                <section className="builder-playback-table" aria-label="DP table">
+                  <DPTable frame={execution.frame} />
+                </section>
+                <aside className="builder-playback-details" aria-label="Frame details">
+                  <FrameDetails frame={execution.frame} />
+                </aside>
+                <section className="builder-playback-timeline" aria-label="Playback timeline">
+                  <PlaybackTimeline
+                    frame={execution.frame}
+                    onSeek={(index) => setFrame(execution.session.controller.seek(index))}
+                  />
+                  <nav className="app-playback-controls" aria-label="Playback controls">
+                    <button
+                      type="button"
+                      onClick={() => setFrame(execution.session.previous())}
+                      disabled={execution.frame.isFirst}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFrame(execution.session.reset())}
+                      disabled={execution.frame.isFirst}
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFrame(execution.session.next())}
+                      disabled={execution.frame.isLast}
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </section>
               </section>
-              <aside className="builder-playback-details" aria-label="Frame details">
-                <FrameDetails frame={execution.frame} />
-              </aside>
-              <section className="builder-playback-timeline" aria-label="Playback timeline">
-                <PlaybackTimeline
-                  frame={execution.frame}
-                  onSeek={(index) => setFrame(execution.session.controller.seek(index))}
-                />
-                <nav className="app-playback-controls" aria-label="Playback controls">
-                  <button
-                    type="button"
-                    onClick={() => setFrame(execution.session.previous())}
-                    disabled={execution.frame.isFirst}
-                  >
-                    Previous
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFrame(execution.session.reset())}
-                    disabled={execution.frame.isFirst}
-                  >
-                    Reset
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFrame(execution.session.next())}
-                    disabled={execution.frame.isLast}
-                  >
-                    Next
-                  </button>
-                </nav>
-              </section>
-            </section>
+            </>
           )}
         </section>
       )}

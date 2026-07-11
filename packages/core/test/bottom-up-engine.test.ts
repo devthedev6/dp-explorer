@@ -119,6 +119,33 @@ describe("runBottomUp", () => {
     expect(result.dpTable.has("2")).toBe(true);
     expect("set" in result.dpTable).toBe(false);
   });
+
+  it("initializes every state once when a ProblemSpec provides an initial value", () => {
+    let initialCalls = 0;
+    const spec: ProblemSpec<FibonacciInput> = {
+      ...fibonacciSpec,
+      initialValue: () => {
+        initialCalls += 1;
+        return 100;
+      },
+      baseCase: (state) =>
+        readSingleCoordinate(state) === 0 ? { isBase: true, value: 0 } : { isBase: false },
+      transition: (state, ctx) => {
+        const i = readSingleCoordinate(state);
+        return i === 1 ? ctx.read([0]) + 1 : ctx.read([i - 1]);
+      }
+    };
+
+    const result = runBottomUp(spec, { n: 3 });
+
+    expect(initialCalls).toBe(1);
+    expect([...result.dpTable.entries()]).toEqual([
+      ["0", 0],
+      ["1", 1],
+      ["2", 1],
+      ["3", 1]
+    ]);
+  });
 });
 
 function readSingleCoordinate(state: StateCoordinates): number {

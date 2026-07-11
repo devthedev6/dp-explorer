@@ -93,6 +93,7 @@ export interface ProblemSpec<Input = unknown> {
   readonly formulation?: AlgorithmFormulation;
   readonly stateVariables: readonly string[];
   readonly inputSchema: readonly InputField[];
+  initialValue?(input: Input): number;
   dimensions(input: Input): readonly number[];
   rootState(input: Input): StateCoordinates;
   baseCase(state: StateCoordinates, input: Input): BaseCaseResult;

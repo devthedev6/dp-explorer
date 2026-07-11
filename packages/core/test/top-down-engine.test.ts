@@ -193,6 +193,23 @@ describe("runTopDown", () => {
     expect(result.dpTable.has("2")).toBe(true);
     expect("set" in result.dpTable).toBe(false);
   });
+
+  it("initializes unvisited states in the returned table when provided", () => {
+    let initialCalls = 0;
+    const spec: ProblemSpec<FibonacciInput> = {
+      ...fibonacciSpec,
+      initialValue: () => {
+        initialCalls += 1;
+        return -1;
+      }
+    };
+
+    const result = runTopDown(spec, { n: 1 });
+
+    expect(initialCalls).toBe(1);
+    expect(result.dpTable.get("0")).toBe(-1);
+    expect(result.dpTable.get("1")).toBe(1);
+  });
 });
 
 function readSingleCoordinate(state: StateCoordinates): number {

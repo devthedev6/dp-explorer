@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -7,6 +7,7 @@ import {
   BoundsEditor,
   BuilderProvider,
   ExpressionLanguageReference,
+  InitialValueEditor,
   ReviewCompileStage,
   RootStateEditor,
   SpecificationBuilderPage,
@@ -269,6 +270,23 @@ describe("AnswerEditor", () => {
   });
 });
 
+describe("InitialValueEditor", () => {
+  it("updates the initial DP value expression in BuilderState", () => {
+    render(
+      <BuilderProvider>
+        <InitialValueEditor />
+        <StateProbe />
+      </BuilderProvider>
+    );
+
+    fireEvent.change(screen.getByLabelText(/Initial DP Value/i), {
+      target: { value: "INF" }
+    });
+
+    expect(screen.getByDisplayValue("INF")).toBeDefined();
+  });
+});
+
 describe("ReviewCompileStage", () => {
   it("renders a JSON preview and an enabled compile button", () => {
     render(
@@ -344,6 +362,9 @@ describe("ReviewCompileStage", () => {
     fireEvent.click(screen.getByRole("button", { name: /run specification/i }));
 
     expect(screen.getByTestId("recursion-tree")).toBeDefined();
+    const answerPanel = screen.getByLabelText(/execution answer/i);
+    expect(within(answerPanel).getByRole("heading", { name: "Answer" })).toBeDefined();
+    expect(within(answerPanel).getByText("2")).toBeDefined();
     expect(screen.getByRole("heading", { name: "DP table" })).toBeDefined();
     expect(screen.getByText(/Current event/i)).toBeDefined();
     expect(screen.getByTestId("timeline-position").textContent).toContain("1 /");

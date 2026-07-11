@@ -114,6 +114,10 @@ function collectValidationTargets(parsedSpecification: ParsedSpecification): rea
   });
 
   targets.push({
+    parsedExpression: parsedSpecification.parsedInitialValueExpression,
+    path: ["initialValueExpression"]
+  });
+  targets.push({
     parsedExpression: parsedSpecification.parsedRootState,
     path: ["rootStateExpression"]
   });
@@ -193,6 +197,14 @@ function validateAccessorNode(node: MathNode, context: ValidationContext): void 
 
     if (name !== null && symbol === null) {
       addDiagnostic(context, `Array "${name}" is not declared.`, node);
+    } else if (symbol?.kind === "primitive" && symbol.primitiveType === "string") {
+      if (chain.dimensions.length !== 1) {
+        addDiagnostic(
+          context,
+          `String "${name}" expects 1 index but received ${chain.dimensions.length}.`,
+          node
+        );
+      }
     } else if (symbol?.kind !== "array") {
       addDiagnostic(context, `Identifier "${name}" is not an array and cannot be indexed.`, node);
     } else if (symbol.dimensions !== chain.dimensions.length) {

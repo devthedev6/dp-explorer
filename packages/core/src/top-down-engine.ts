@@ -24,6 +24,7 @@ export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): Execu
   const events: TraceEvent[] = [];
   const memo = new Map<ReturnType<typeof toStateKey>, number>();
   const inputSnapshot = deepFreeze(cloneInput(input));
+  const initialValue = spec.initialValue?.(input);
 
   const nextId = (): TraceEventId => events.length;
 
@@ -130,7 +131,10 @@ export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): Execu
   evaluate(spec.rootState(input), null, 0);
 
   const dimensions = Object.freeze([...spec.dimensions(input)]);
-  const dpTable = freezeDpTable(memo);
+  const dpTable =
+    initialValue === undefined
+      ? freezeDpTable(memo)
+      : freezeDpTable(createInitializedTable(spec, input, initialValue, memo));
   const extractionContext = createExtractionContextFromTable({
     dpTable,
     input: inputSnapshot,
@@ -161,6 +165,22 @@ export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): Execu
 
 function freezeTrace<Input>(trace: ExecutionTrace<Input>): ExecutionTrace<Input> {
   return Object.freeze(trace);
+}
+
+function createInitializedTable<Input>(
+  spec: ProblemSpec<Input>,
+  input: Input,
+  initialValue: number,
+  memo: ReadonlyMap<ReturnType<typeof toStateKey>, number>
+): Map<ReturnType<typeof toStateKey>, number> {
+  const table = new Map<ReturnType<typeof toStateKey>, number>();
+  for (const state of spec.iterationOrder(input)) {
+    table.set(toStateKey(state), initialValue);
+  }
+  for (const [stateKey, value] of memo) {
+    table.set(stateKey, value);
+  }
+  return table;
 }
 
 function cloneInput<Input>(input: Input): Input {

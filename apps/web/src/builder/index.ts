@@ -31,6 +31,7 @@ export { StateEditor } from "./state-editor";
 export { BoundsEditor } from "./bounds-editor";
 export { BaseCasesEditor } from "./base-cases-editor";
 export { TransitionsEditor } from "./transitions-editor";
+export { InitialValueEditor } from "./initial-value-editor";
 export { RootStateEditor } from "./root-state-editor";
 export { AnswerEditor } from "./answer-editor";
 export { ReviewCompileStage } from "./review-compile-stage";

@@ -6,6 +6,7 @@ import { StateEditor } from "./state-editor";
 import { BoundsEditor } from "./bounds-editor";
 import { BaseCasesEditor } from "./base-cases-editor";
 import { TransitionsEditor } from "./transitions-editor";
+import { InitialValueEditor } from "./initial-value-editor";
 import { RootStateEditor } from "./root-state-editor";
 import { AnswerEditor } from "./answer-editor";
 import { ReviewCompileStage } from "./review-compile-stage";
@@ -136,6 +137,7 @@ function BuilderStageView({ stageId }: BuilderStageViewProps) {
       {stageId === "bounds" && <BoundsEditor />}
       {stageId === "base-cases" && <BaseCasesEditor />}
       {stageId === "transitions" && <TransitionsEditor />}
+      {stageId === "initial-value" && <InitialValueEditor />}
       {stageId === "root-state" && <RootStateEditor />}
       {stageId === "answer" && <AnswerEditor />}
       {stageId === "review-compile" && <ReviewCompileStage />}

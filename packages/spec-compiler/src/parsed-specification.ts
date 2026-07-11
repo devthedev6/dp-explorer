@@ -40,6 +40,7 @@ export interface ParsedSpecification {
   readonly parsedTransitionConditions: readonly (ParsedExpression | null)[];
   readonly parsedTransitionExpressions: readonly ParsedExpression[];
   readonly parsedTransitions: readonly ParsedTransition[];
+  readonly parsedInitialValueExpression: ParsedExpression;
   readonly parsedRootState: ParsedExpression;
   readonly parsedAnswerExpression: ParsedExpression;
 }

@@ -45,6 +45,7 @@ export interface BuilderState {
   };
   readonly baseCases: readonly BuilderBaseCase[];
   readonly transitions: readonly BuilderTransition[];
+  readonly initialValueExpression?: string;
   readonly rootStateExpression: string;
   readonly answerExpression: string;
   readonly executionMode: ExecutionMode;

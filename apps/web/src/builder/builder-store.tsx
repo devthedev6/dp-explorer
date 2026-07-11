@@ -62,6 +62,10 @@ export type BuilderAction =
       readonly expression: string;
     }
   | {
+      readonly type: "SET_INITIAL_VALUE_EXPRESSION";
+      readonly expression: string;
+    }
+  | {
       readonly type: "SET_ANSWER_EXPRESSION";
       readonly expression: string;
     }
@@ -238,6 +242,11 @@ function builderReducer(state: BuilderReducerState, action: BuilderAction): Buil
       return withBuilderState({
         ...state.builderState,
         rootStateExpression: action.expression
+      });
+    case "SET_INITIAL_VALUE_EXPRESSION":
+      return withBuilderState({
+        ...state.builderState,
+        initialValueExpression: action.expression
       });
     case "SET_ANSWER_EXPRESSION":
       return withBuilderState({

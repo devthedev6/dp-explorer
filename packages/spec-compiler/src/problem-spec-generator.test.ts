@@ -46,6 +46,34 @@ describe("generateProblemSpec", () => {
     expect(spec.extractAnswer(context)).toBe(15);
     expect([...result.dpTable.values()]).toEqual([4, 9, 15]);
   });
+
+  it("evaluates initial DP values for generated ProblemSpecs", () => {
+    const spec = compileBuilderState({
+      ...createFibonacciBuilderState(),
+      symbols: [
+        ...createFibonacciBuilderState().symbols,
+        {
+          id: "symbol-seed",
+          name: "seed",
+          category: "primitive",
+          primitiveType: "integer"
+        }
+      ],
+      initialValueExpression: "seed + 1"
+    });
+
+    expect(spec.initialValue?.({ n: 2, seed: 40 })).toBe(41);
+  });
+
+  it("compiles and executes primitive string indexing", () => {
+    const spec = compileBuilderState(createStringIndexingBuilderState());
+    const input = { s: "abc" };
+    const result = runBottomUp(spec, input);
+    const context = createExtractionContext(result);
+
+    expect(spec.dimensions(input)).toEqual([3]);
+    expect(spec.extractAnswer(context)).toBe(3);
+  });
 });
 
 function compileBuilderState(builderState: BuilderState) {
@@ -106,6 +134,7 @@ function createFibonacciBuilderState(): BuilderState {
         valueExpression: "DP(i - 1) + DP(i - 2)"
       }
     ],
+    initialValueExpression: "0",
     rootStateExpression: "DP(n)",
     answerExpression: "DP(n)",
     executionMode: "bottom-up"
@@ -170,8 +199,55 @@ function createArrayBuilderState(): BuilderState {
         valueExpression: "DP(i - 1) + values[i] + min(abs(-1), ceil(0.2)) + (BONUS & 1)"
       }
     ],
+    initialValueExpression: "0",
     rootStateExpression: "DP(n)",
     answerExpression: "max(DP(n), 0)",
+    executionMode: "bottom-up"
+  };
+}
+
+function createStringIndexingBuilderState(): BuilderState {
+  return {
+    metadata: {
+      name: "String Indexing",
+      description: "Generated string indexing specification"
+    },
+    symbols: [
+      {
+        id: "symbol-s",
+        name: "s",
+        category: "primitive",
+        primitiveType: "string"
+      }
+    ],
+    state: {
+      dimensionCount: 1,
+      variables: [
+        {
+          name: "i",
+          lowerBoundExpression: "0",
+          upperBoundExpression: "len(s) - 1"
+        }
+      ],
+      meaning: "dp[i]"
+    },
+    baseCases: [
+      {
+        id: "base-0",
+        conditionExpression: "i == 0",
+        valueExpression: "s[0] == s[i]"
+      }
+    ],
+    transitions: [
+      {
+        id: "transition-1",
+        conditionExpression: null,
+        valueExpression: "DP(i - 1) + (s[i] == s[i])"
+      }
+    ],
+    initialValueExpression: "0",
+    rootStateExpression: "DP(len(s) - 1)",
+    answerExpression: "DP(len(s) - 1)",
     executionMode: "bottom-up"
   };
 }

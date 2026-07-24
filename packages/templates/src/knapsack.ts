@@ -1,4 +1,4 @@
-import type { ProblemSpec, StateCoordinates } from "@dp-explorer/core";
+import type { FunctionalProblemSpec, StateCoordinates } from "@dp-explorer/core";
 
 export interface KnapsackInput {
   readonly capacity: number;
@@ -7,14 +7,14 @@ export interface KnapsackInput {
 }
 
 /**
- * 0/1 Knapsack ProblemSpec.
+ * 0/1 Knapsack functional specification.
  *
  * State (i, w) represents the maximum value obtainable using the first i items
  * with a knapsack capacity of w. Base cases occur when no items are available
  * or no capacity remains. The recurrence either skips the current item or
  * includes it if it fits.
  */
-export const knapsackSpec: ProblemSpec<KnapsackInput> = {
+export const knapsackSpec: FunctionalProblemSpec<KnapsackInput> = {
   id: "knapsack",
   name: "0/1 Knapsack",
   title: "0/1 Knapsack",

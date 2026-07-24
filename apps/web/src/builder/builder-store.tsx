@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, type ReactNode } from "react";
 import type { CompilerDiagnostic } from "@dp-explorer/spec-compiler";
-import type { ProblemSpec } from "@dp-explorer/core";
+import type { FunctionalProblemSpec } from "@dp-explorer/core";
 import type {
   BuilderBaseCase,
   BuilderState,
@@ -71,7 +71,7 @@ export type BuilderAction =
     }
   | {
       readonly type: "COMPILE_SUCCESS";
-      readonly problemSpec: ProblemSpec<Record<string, unknown>>;
+      readonly problemSpec: FunctionalProblemSpec<Record<string, unknown>>;
     }
   | {
       readonly type: "COMPILE_FAILURE";
@@ -82,7 +82,7 @@ export type CompilationStatus = "idle" | "success" | "failure";
 
 export interface BuilderCompilationState {
   readonly status: CompilationStatus;
-  readonly problemSpec: ProblemSpec<Record<string, unknown>> | null;
+  readonly problemSpec: FunctionalProblemSpec<Record<string, unknown>> | null;
   readonly diagnostics: readonly CompilerDiagnostic[];
 }
 

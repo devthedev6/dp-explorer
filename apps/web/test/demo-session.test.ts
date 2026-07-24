@@ -93,7 +93,7 @@ describe("createDemoSession", () => {
     expect("answer" in completeEvent ? completeEvent.answer : null).toBe(3);
   });
 
-  it("runs a compiled ProblemSpec through the generic top-down session path", () => {
+  it("runs a compiled functional specification through the generic top-down session path", () => {
     const compiled = compileSpecification(createCompiledFibonacciBuilderState("top-down"));
     if (!compiled.success) {
       throw new Error("Expected compilation to succeed.");
@@ -105,7 +105,7 @@ describe("createDemoSession", () => {
     expect(session.currentFrame().recursionTree).not.toBeNull();
   });
 
-  it("runs a compiled ProblemSpec through the generic bottom-up session path", () => {
+  it("runs a compiled functional specification through the generic bottom-up session path", () => {
     const compiled = compileSpecification(createCompiledFibonacciBuilderState("bottom-up"));
     if (!compiled.success) {
       throw new Error("Expected compilation to succeed.");

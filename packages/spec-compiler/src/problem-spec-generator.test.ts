@@ -2,11 +2,11 @@ import { createExtractionContext, runBottomUp, runTopDown } from "@dp-explorer/c
 import { describe, expect, it } from "vitest";
 import type { BuilderState } from "./builder-state";
 import { parseSpecification } from "./parser";
-import { generateProblemSpec } from "./problem-spec-generator";
+import { generateFunctionalProblemSpec } from "./problem-spec-generator";
 import { validateSpecification } from "./semantic-validator";
 
-describe("generateProblemSpec", () => {
-  it("compiles a valid BuilderState into a working ProblemSpec", () => {
+describe("generateFunctionalProblemSpec", () => {
+  it("compiles a valid BuilderState into a working functional specification", () => {
     const spec = compileBuilderState(createFibonacciBuilderState());
 
     expect(spec.id).toBe("generated-fibonacci");
@@ -87,7 +87,7 @@ function compileBuilderState(builderState: BuilderState) {
     throw new Error("Expected test BuilderState to validate.");
   }
 
-  return generateProblemSpec(validationResult.validatedSpecification);
+  return generateFunctionalProblemSpec(validationResult.validatedSpecification);
 }
 
 function createFibonacciBuilderState(): BuilderState {

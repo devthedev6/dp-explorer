@@ -1,16 +1,16 @@
-import type { ProblemSpec, StateCoordinates } from "@dp-explorer/core";
+import type { FunctionalProblemSpec, StateCoordinates } from "@dp-explorer/core";
 
 export interface FibonacciInput {
   readonly n: number;
 }
 
 /**
- * Minimal Fibonacci ProblemSpec used to verify the pipeline composition.
+ * Minimal Fibonacci functional specification used to verify the pipeline composition.
  *
  * The recurrence lives in the template package as declarative math. Execution
  * order, recursion, memoization, and trace emission remain owned by core.
  */
-export const fibonacciSpec: ProblemSpec<FibonacciInput> = {
+export const fibonacciSpec: FunctionalProblemSpec<FibonacciInput> = {
   id: "fibonacci",
   name: "Fibonacci",
   title: "Fibonacci Numbers",

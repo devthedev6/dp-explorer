@@ -66,7 +66,7 @@ describe("compileSpecification", () => {
     ]);
   });
 
-  it("returns a working ProblemSpec on successful compilation", () => {
+  it("returns a working functional specification on successful compilation", () => {
     const result = compileSpecification(createFibonacciBuilderState());
     if (!result.success) {
       throw new Error("Expected compilation to succeed.");

@@ -2,7 +2,7 @@ import {
   EventType,
   runBottomUp,
   runTopDown,
-  type ProblemSpec,
+  type FunctionalProblemSpec,
   type TraceEvent
 } from "@dp-explorer/core";
 import type { ExecutionFrame, PlaybackController } from "@dp-explorer/playback";
@@ -33,7 +33,7 @@ export function createDemoSession(template: RegisteredTemplate): DemoSession {
 }
 
 export function createProblemSpecSession<Input>(
-  spec: ProblemSpec<Input>,
+  spec: FunctionalProblemSpec<Input>,
   input: Input,
   mode: RuntimeExecutionMode
 ): DemoSession {

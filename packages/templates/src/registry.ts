@@ -1,4 +1,4 @@
-import type { ProblemSpec } from "@dp-explorer/core";
+import type { FunctionalProblemSpec } from "@dp-explorer/core";
 import { fibonacciSpec } from "./fibonacci";
 import { longestCommonSubsequenceSpec } from "./longest-common-subsequence";
 import { editDistanceSpec } from "./edit-distance";
@@ -10,7 +10,7 @@ import { coinChangeSpec } from "./coin-change";
 export interface RegisteredTemplate {
   readonly id: string;
   readonly name: string;
-  readonly spec: ProblemSpec<unknown>;
+  readonly spec: FunctionalProblemSpec<unknown>;
   readonly defaultInput: Readonly<Record<string, unknown>>;
 }
 
@@ -45,42 +45,42 @@ export const templateRegistry = new TemplateRegistry();
 templateRegistry.register({
   id: fibonacciSpec.id,
   name: fibonacciSpec.name,
-  spec: fibonacciSpec as ProblemSpec<unknown>,
+  spec: fibonacciSpec as FunctionalProblemSpec<unknown>,
   defaultInput: { n: 5 }
 });
 
 templateRegistry.register({
   id: longestCommonSubsequenceSpec.id,
   name: longestCommonSubsequenceSpec.name,
-  spec: longestCommonSubsequenceSpec as ProblemSpec<unknown>,
+  spec: longestCommonSubsequenceSpec as FunctionalProblemSpec<unknown>,
   defaultInput: { first: "ABCDGH", second: "AEDFHR" }
 });
 
 templateRegistry.register({
   id: editDistanceSpec.id,
   name: editDistanceSpec.name,
-  spec: editDistanceSpec as ProblemSpec<unknown>,
+  spec: editDistanceSpec as FunctionalProblemSpec<unknown>,
   defaultInput: { first: "kitten", second: "sitting" }
 });
 
 templateRegistry.register({
   id: knapsackSpec.id,
   name: knapsackSpec.name,
-  spec: knapsackSpec as ProblemSpec<unknown>,
+  spec: knapsackSpec as FunctionalProblemSpec<unknown>,
   defaultInput: { capacity: 7, weights: "1,3,4,5", values: "1,4,5,7" }
 });
 
 templateRegistry.register({
   id: uniquePathsIISpec.id,
   name: uniquePathsIISpec.name,
-  spec: uniquePathsIISpec as ProblemSpec<unknown>,
+  spec: uniquePathsIISpec as FunctionalProblemSpec<unknown>,
   defaultInput: { rows: 3, columns: 3, blocked: "1,1\n2,0" }
 });
 
 templateRegistry.register({
   id: minimumPathSumSpec.id,
   name: minimumPathSumSpec.name,
-  spec: minimumPathSumSpec as ProblemSpec<unknown>,
+  spec: minimumPathSumSpec as FunctionalProblemSpec<unknown>,
   defaultInput: {
     rows: 3,
     columns: 3,
@@ -95,6 +95,6 @@ templateRegistry.register({
 templateRegistry.register({
   id: coinChangeSpec.id,
   name: coinChangeSpec.name,
-  spec: coinChangeSpec as ProblemSpec<unknown>,
+  spec: coinChangeSpec as FunctionalProblemSpec<unknown>,
   defaultInput: { coins: "1,3,4", target: 6 }
 });

@@ -352,7 +352,7 @@ describe("ReviewCompileStage", () => {
     expect(screen.getByText(/not compiled yet/i)).toBeDefined();
   });
 
-  it("stores a ProblemSpec when compilation succeeds", () => {
+  it("stores a functional specification when compilation succeeds", () => {
     render(
       <BuilderProvider initialState={createCompilableBuilderState()}>
         <ReviewCompileStage />
@@ -398,7 +398,7 @@ describe("ReviewCompileStage", () => {
     expect(screen.queryByRole("button", { name: /run specification/i })).toBeNull();
   });
 
-  it("executes a compiled ProblemSpec through the existing playback UI", () => {
+  it("executes a compiled functional specification through the existing playback UI", () => {
     render(
       <BuilderProvider initialState={createCompilableBuilderState()}>
         <ReviewCompileStage />
@@ -427,7 +427,7 @@ describe("ReviewCompileStage", () => {
   });
 
   it.each([1, 2, 3, 4, 5])(
-    "executes a compiled %dD ProblemSpec and presents supported playback",
+    "executes a compiled %dD functional specification and presents supported playback",
     (dimensionCount) => {
       render(
         <BuilderProvider initialState={createDimensionalBuilderState(dimensionCount)}>

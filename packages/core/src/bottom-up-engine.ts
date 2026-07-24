@@ -1,4 +1,4 @@
-import type { ProblemSpec } from "./problem-spec";
+import type { FunctionalProblemSpec } from "./problem-spec";
 import type { ExecutionResult } from "./execution-result";
 import { freezeDpTable } from "./execution-result";
 import { createExtractionContextFromTable } from "./extraction-context";
@@ -9,14 +9,17 @@ import { EventType } from "./trace";
 import type { TraceEvent, TraceEventId } from "./trace";
 
 /**
- * Execute a `ProblemSpec` using bottom-up tabulation and produce an immutable
+ * Execute a `FunctionalProblemSpec` using bottom-up tabulation and produce an immutable
  * execution trace.
  *
  * The engine is generic: it follows the spec's iteration order, instruments
  * every transition read, and emits the existing trace format consumed by
  * playback.
  */
-export function runBottomUp<Input>(spec: ProblemSpec<Input>, input: Input): ExecutionResult<Input> {
+export function runBottomUp<Input>(
+  spec: FunctionalProblemSpec<Input>,
+  input: Input
+): ExecutionResult<Input> {
   const events: TraceEvent[] = [];
   const table = new Map<ReturnType<typeof toStateKey>, number>();
   const inputSnapshot = deepFreeze(cloneInput(input));
@@ -46,7 +49,7 @@ export function runBottomUp<Input>(spec: ProblemSpec<Input>, input: Input): Exec
     if (value === undefined) {
       throw new Error(
         `Bottom-up iteration order read unwritten state ${stateKey}. ` +
-          "ProblemSpec.iterationOrder must yield dependencies before dependents."
+          "FunctionalProblemSpec.iterationOrder must yield dependencies before dependents."
       );
     }
 

@@ -3,7 +3,7 @@ import type {
   ExtractionContext,
   InputField,
   InputFieldType,
-  ProblemSpec,
+  FunctionalProblemSpec,
   StateCoordinates
 } from "@dp-explorer/core";
 import type { MathNode } from "mathjs";
@@ -19,9 +19,9 @@ import {
 import type { BuilderSymbol, PrimitiveType } from "./builder-state";
 import type { ValidatedSpecification } from "./validated-specification";
 
-export function generateProblemSpec(
+export function generateFunctionalProblemSpec(
   validatedSpecification: ValidatedSpecification
-): ProblemSpec<Record<string, unknown>> {
+): FunctionalProblemSpec<Record<string, unknown>> {
   const parsed = validatedSpecification.parsedSpecification;
   const builderState = parsed.builderState;
   const stateVariables = Object.freeze(
@@ -29,7 +29,7 @@ export function generateProblemSpec(
   );
   const constants = createConstantMap(parsed.parsedConstants);
 
-  const spec: ProblemSpec<Record<string, unknown>> = {
+  const spec: FunctionalProblemSpec<Record<string, unknown>> = {
     id: createProblemId(builderState.metadata.name),
     name: builderState.metadata.name,
     title: builderState.metadata.name,

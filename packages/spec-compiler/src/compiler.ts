@@ -1,7 +1,7 @@
 import type { BuilderState } from "./builder-state";
 import type { CompileResult } from "./compile-result";
 import { parseSpecification } from "./parser";
-import { generateProblemSpec } from "./problem-spec-generator";
+import { generateFunctionalProblemSpec } from "./problem-spec-generator";
 import { validateSpecification } from "./semantic-validator";
 
 export function compileSpecification(builderState: BuilderState): CompileResult {
@@ -24,6 +24,6 @@ export function compileSpecification(builderState: BuilderState): CompileResult 
   return Object.freeze({
     success: true,
     diagnostics: [] as const,
-    problemSpec: generateProblemSpec(validationResult.validatedSpecification)
+    problemSpec: generateFunctionalProblemSpec(validationResult.validatedSpecification)
   });
 }

@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import type { ProblemSpec, StateCoordinates } from "../src";
+import type { FunctionalProblemSpec, StateCoordinates } from "../src";
 import { createExtractionContext, runBottomUp, runTopDown } from "../src";
 
 interface FibonacciInput {
   readonly n: number;
 }
 
-const fibonacciSpec: ProblemSpec<FibonacciInput> = {
+const fibonacciSpec: FunctionalProblemSpec<FibonacciInput> = {
   id: "fibonacci",
   name: "Fibonacci",
   stateVariables: ["i"],

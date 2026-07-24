@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import type { ProblemSpec, StateCoordinates, TraceEvent } from "../src";
+import type { FunctionalProblemSpec, StateCoordinates, TraceEvent } from "../src";
 import { EventType, runBottomUp } from "../src";
 
 interface FibonacciInput {
   readonly n: number;
 }
 
-const fibonacciSpec: ProblemSpec<FibonacciInput> = {
+const fibonacciSpec: FunctionalProblemSpec<FibonacciInput> = {
   id: "fibonacci",
   name: "Fibonacci",
   stateVariables: ["i"],
@@ -59,7 +59,7 @@ describe("runBottomUp", () => {
   });
 
   it("throws when iteration order reads an unwritten dependency", () => {
-    const invalidSpec: ProblemSpec<FibonacciInput> = {
+    const invalidSpec: FunctionalProblemSpec<FibonacciInput> = {
       ...fibonacciSpec,
       iterationOrder: function* (input) {
         for (let i = input.n; i >= 0; i -= 1) {
@@ -120,9 +120,9 @@ describe("runBottomUp", () => {
     expect("set" in result.dpTable).toBe(false);
   });
 
-  it("initializes every state once when a ProblemSpec provides an initial value", () => {
+  it("initializes every state once when a functional specification provides an initial value", () => {
     let initialCalls = 0;
-    const spec: ProblemSpec<FibonacciInput> = {
+    const spec: FunctionalProblemSpec<FibonacciInput> = {
       ...fibonacciSpec,
       initialValue: () => {
         initialCalls += 1;

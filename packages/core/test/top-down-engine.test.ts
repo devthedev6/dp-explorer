@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import type { ProblemSpec, StateCoordinates, TraceEvent } from "../src";
+import type { FunctionalProblemSpec, StateCoordinates, TraceEvent } from "../src";
 import { EventType, runTopDown } from "../src";
 
 interface FibonacciInput {
   readonly n: number;
 }
 
-const fibonacciSpec: ProblemSpec<FibonacciInput> = {
+const fibonacciSpec: FunctionalProblemSpec<FibonacciInput> = {
   id: "fibonacci",
   name: "Fibonacci",
   stateVariables: ["i"],
@@ -196,7 +196,7 @@ describe("runTopDown", () => {
 
   it("initializes unvisited states in the returned table when provided", () => {
     let initialCalls = 0;
-    const spec: ProblemSpec<FibonacciInput> = {
+    const spec: FunctionalProblemSpec<FibonacciInput> = {
       ...fibonacciSpec,
       initialValue: () => {
         initialCalls += 1;

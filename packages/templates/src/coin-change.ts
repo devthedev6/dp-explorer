@@ -1,4 +1,4 @@
-import type { ProblemSpec, StateCoordinates } from "@dp-explorer/core";
+import type { FunctionalProblemSpec, StateCoordinates } from "@dp-explorer/core";
 
 export interface CoinChangeInput {
   readonly coins: readonly number[];
@@ -8,14 +8,14 @@ export interface CoinChangeInput {
 const UNREACHABLE = Number.POSITIVE_INFINITY;
 
 /**
- * Coin Change (Minimum Coins) ProblemSpec.
+ * Coin Change (Minimum Coins) functional specification.
  *
  * State x represents the minimum number of coins required to make amount x.
  * dp[0] is 0. All other states start unreachable. For each coin not larger
  * than x, consider using that coin once and taking the minimum over all
  * candidates.
  */
-export const coinChangeSpec: ProblemSpec<CoinChangeInput> = {
+export const coinChangeSpec: FunctionalProblemSpec<CoinChangeInput> = {
   id: "coin-change",
   name: "Coin Change",
   title: "Coin Change (Minimum Coins)",

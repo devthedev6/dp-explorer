@@ -2,8 +2,8 @@
  * Intermediate representation produced by the Specification Builder.
  *
  * BuilderState deliberately mirrors the stages of the visual wizard. It is
- * NOT a ProblemSpec; the semantic compiler will transform a completed
- * BuilderState into a runtime ProblemSpec in later sessions.
+ * NOT a compiled specification; the semantic compiler transforms a completed
+ * BuilderState into a runtime functional specification.
  */
 
 /** Supported primitive input types for symbol declarations. */

@@ -1,4 +1,4 @@
-import type { ProblemSpec } from "@dp-explorer/core";
+import type { FunctionalProblemSpec } from "@dp-explorer/core";
 import type { ParseDiagnostic } from "./diagnostics";
 import type { SemanticDiagnostic } from "./validator-diagnostics";
 
@@ -8,7 +8,7 @@ export type CompileResult =
   | {
       readonly success: true;
       readonly diagnostics: readonly [];
-      readonly problemSpec: ProblemSpec<Record<string, unknown>>;
+      readonly problemSpec: FunctionalProblemSpec<Record<string, unknown>>;
     }
   | {
       readonly success: false;

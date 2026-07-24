@@ -1,4 +1,4 @@
-import type { ProblemSpec, StateCoordinates } from "@dp-explorer/core";
+import type { FunctionalProblemSpec, StateCoordinates } from "@dp-explorer/core";
 
 export interface MinimumPathSumInput {
   readonly rows: number;
@@ -7,14 +7,14 @@ export interface MinimumPathSumInput {
 }
 
 /**
- * Minimum Path Sum ProblemSpec.
+ * Minimum Path Sum functional specification.
  *
  * State (i, j) represents the minimum cost to reach cell (i, j) from the top-left
  * corner. The start cell contributes its own cost. The first row and first
  * column each have only one possible path. All other cells choose the cheaper
  * of the cell above or to the left and add the current cell's cost.
  */
-export const minimumPathSumSpec: ProblemSpec<MinimumPathSumInput> = {
+export const minimumPathSumSpec: FunctionalProblemSpec<MinimumPathSumInput> = {
   id: "minimum-path-sum",
   name: "Minimum Path Sum",
   title: "Minimum Path Sum",

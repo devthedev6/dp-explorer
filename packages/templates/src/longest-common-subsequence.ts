@@ -1,4 +1,4 @@
-import type { ProblemSpec, StateCoordinates } from "@dp-explorer/core";
+import type { FunctionalProblemSpec, StateCoordinates } from "@dp-explorer/core";
 
 export interface LongestCommonSubsequenceInput {
   readonly first: string;
@@ -6,14 +6,14 @@ export interface LongestCommonSubsequenceInput {
 }
 
 /**
- * Longest Common Subsequence (LCS) ProblemSpec.
+ * Longest Common Subsequence (LCS) functional specification.
  *
  * State (i, j) represents the LCS length of the suffixes first[i:] and
  * second[j:]. Base cases occur when either suffix is empty. The recurrence
  * matches characters at i and j, otherwise takes the best of skipping either
  * character.
  */
-export const longestCommonSubsequenceSpec: ProblemSpec<LongestCommonSubsequenceInput> = {
+export const longestCommonSubsequenceSpec: FunctionalProblemSpec<LongestCommonSubsequenceInput> = {
   id: "longest-common-subsequence",
   name: "Longest Common Subsequence",
   title: "Longest Common Subsequence",

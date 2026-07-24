@@ -1,4 +1,4 @@
-import type { ProblemSpec } from "./problem-spec";
+import type { FunctionalProblemSpec } from "./problem-spec";
 import type { ExecutionResult } from "./execution-result";
 import { freezeDpTable } from "./execution-result";
 import { createExtractionContextFromTable } from "./extraction-context";
@@ -14,13 +14,16 @@ interface EvaluationResult {
 }
 
 /**
- * Execute a `ProblemSpec` using memoized recursion and produce an immutable
+ * Execute a `FunctionalProblemSpec` using memoized recursion and produce an immutable
  * execution trace.
  *
  * The engine is generic: it knows how to walk states, memoize values, and emit
  * events, but it has no knowledge of any particular DP problem or UI concern.
  */
-export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): ExecutionResult<Input> {
+export function runTopDown<Input>(
+  spec: FunctionalProblemSpec<Input>,
+  input: Input
+): ExecutionResult<Input> {
   const events: TraceEvent[] = [];
   const memo = new Map<ReturnType<typeof toStateKey>, number>();
   const inputSnapshot = deepFreeze(cloneInput(input));
@@ -51,7 +54,9 @@ export function runTopDown<Input>(spec: ProblemSpec<Input>, input: Input): Execu
     const memoized = memo.get(stateKey);
     if (memoized !== undefined) {
       if (parentId === null) {
-        throw new Error("Root memo hit is invalid for a top-down ProblemSpec answer read.");
+        throw new Error(
+          "Root memo hit is invalid for a top-down functional specification answer read."
+        );
       }
 
       emit({
@@ -168,7 +173,7 @@ function freezeTrace<Input>(trace: ExecutionTrace<Input>): ExecutionTrace<Input>
 }
 
 function createInitializedTable<Input>(
-  spec: ProblemSpec<Input>,
+  spec: FunctionalProblemSpec<Input>,
   input: Input,
   initialValue: number,
   memo: ReadonlyMap<ReturnType<typeof toStateKey>, number>

@@ -1,4 +1,4 @@
-import type { ProblemSpec, StateCoordinates } from "@dp-explorer/core";
+import type { FunctionalProblemSpec, StateCoordinates } from "@dp-explorer/core";
 
 export interface EditDistanceInput {
   readonly first: string;
@@ -6,7 +6,7 @@ export interface EditDistanceInput {
 }
 
 /**
- * Edit Distance (Levenshtein Distance) ProblemSpec.
+ * Edit Distance (Levenshtein Distance) functional specification.
  *
  * State (i, j) represents the minimum number of single-character edits needed
  * to transform the suffix first[i:] into the suffix second[j:]. Base cases
@@ -14,7 +14,7 @@ export interface EditDistanceInput {
  * must all be inserted or deleted. When the leading characters match, no edit
  * is required; otherwise the best of insert, delete, or replace is taken.
  */
-export const editDistanceSpec: ProblemSpec<EditDistanceInput> = {
+export const editDistanceSpec: FunctionalProblemSpec<EditDistanceInput> = {
   id: "edit-distance",
   name: "Edit Distance",
   title: "Edit Distance",

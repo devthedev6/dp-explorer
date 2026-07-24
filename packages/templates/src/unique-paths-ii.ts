@@ -1,4 +1,4 @@
-import type { ProblemSpec, StateCoordinates } from "@dp-explorer/core";
+import type { FunctionalProblemSpec, StateCoordinates } from "@dp-explorer/core";
 
 export interface UniquePathsIIInput {
   readonly rows: number;
@@ -7,14 +7,14 @@ export interface UniquePathsIIInput {
 }
 
 /**
- * Unique Paths II ProblemSpec.
+ * Unique Paths II functional specification.
  *
  * State (i, j) represents the number of ways to reach cell (i, j) from the
  * top-left corner. A blocked cell has zero ways. The start cell has one way
  * if it is not blocked. All other cells sum the ways from above and to the
  * left.
  */
-export const uniquePathsIISpec: ProblemSpec<UniquePathsIIInput> = {
+export const uniquePathsIISpec: FunctionalProblemSpec<UniquePathsIIInput> = {
   id: "unique-paths-ii",
   name: "Unique Paths II",
   title: "Unique Paths II",

@@ -138,7 +138,10 @@ export function ReviewCompileStage() {
         <h4>Compilation Status</h4>
         {compilation.status === "idle" && <p>Not compiled yet.</p>}
         {compilation.status === "success" && (
-          <p>Specification compiled successfully. The generated ProblemSpec is ready to run.</p>
+          <p>
+            Specification compiled successfully. The generated functional specification is ready to
+            run.
+          </p>
         )}
         {compilation.status === "failure" && (
           <>

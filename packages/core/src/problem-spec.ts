@@ -41,7 +41,7 @@ export interface TransitionCtx<Input = unknown> {
 }
 
 /**
- * A recurrence rule over a single state.
+ * A recurrence rule over a single functional-DP state.
  *
  * Template authors provide this math-only function; the Execution Engine owns
  * recursion, iteration, memoization, and trace emission.
@@ -54,7 +54,7 @@ export type Transition<Input = unknown> = (
 /**
  * Structured output of evaluating a transition.
  *
- * The current `ProblemSpec.transition` returns only a number as documented.
+ * The current `FunctionalProblemSpec.transition` returns only a number as documented.
  * This richer value object gives future engine internals a typed place to
  * carry the numeric result alongside the `READ` event ids that explain it.
  */
@@ -80,12 +80,12 @@ export interface AlgorithmFormulation {
 }
 
 /**
- * Declarative description of a DP problem.
+ * Common, compiled description of a DP problem.
  *
- * A `ProblemSpec` says what the state space, base cases, recurrence, iteration
- * order, and answer extraction are. It never specifies how execution happens.
+ * This type contains only concepts shared by every execution model. It never
+ * specifies how execution happens.
  */
-export interface ProblemSpec<Input = unknown> {
+export interface CompiledSpecification<Input = unknown> {
   readonly id: string;
   readonly name: string;
   readonly title?: string;
@@ -93,11 +93,30 @@ export interface ProblemSpec<Input = unknown> {
   readonly formulation?: AlgorithmFormulation;
   readonly stateVariables: readonly string[];
   readonly inputSchema: readonly InputField[];
-  initialValue?(input: Input): number;
   dimensions(input: Input): readonly number[];
+}
+
+/**
+ * Declarative specification for dependency-based state computation.
+ *
+ * Functional specifications add recurrence semantics to the common compiled
+ * specification. The functional runtimes own recursion, iteration,
+ * memoization, and trace emission.
+ */
+export interface FunctionalProblemSpec<Input = unknown> extends CompiledSpecification<Input> {
+  initialValue?(input: Input): number;
   rootState(input: Input): StateCoordinates;
   baseCase(state: StateCoordinates, input: Input): BaseCaseResult;
   transition: Transition<Input>;
   iterationOrder(input: Input): Iterable<StateCoordinates>;
   extractAnswer(context: ExtractionContext<Input>): number;
 }
+
+/**
+ * Placeholder for propagation-specific semantics.
+ *
+ * Propagation execution is intentionally not implemented in this release
+ * session. The type reserves the model-specific branch while sharing only the
+ * common compiled specification contract.
+ */
+export type PropagationProblemSpec<Input = unknown> = CompiledSpecification<Input>;

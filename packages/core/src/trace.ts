@@ -1,7 +1,7 @@
 import type { StateKey } from "./state-key";
 
 /**
- * Execution mode for a trace produced from a `ProblemSpec`.
+ * Execution mode for a trace produced from a functional specification.
  *
  * The same specification must support both modes; the mode belongs to
  * execution, not to template authoring.

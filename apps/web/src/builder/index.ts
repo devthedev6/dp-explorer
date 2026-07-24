@@ -11,6 +11,13 @@ export type {
   SymbolCategory,
   ExecutionMode
 } from "./builder-state";
+export type {
+  BuilderPropagationInitialState,
+  BuilderPropagationTransition,
+  PropagationAggregationKind,
+  PropagationBuilderState,
+  PropagationScheduleKind
+} from "@dp-explorer/spec-compiler";
 export { createDefaultBuilderState } from "./builder-state";
 
 export {

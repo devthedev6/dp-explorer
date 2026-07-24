@@ -30,6 +30,26 @@ export interface BuilderTransition {
   readonly valueExpression: string;
 }
 
+/** A seed value for propagation-based dynamic programming. */
+export interface BuilderPropagationInitialState {
+  readonly id: string;
+  readonly stateExpression: string;
+  readonly valueExpression: string;
+}
+
+/** A guarded update emitted from one propagation state to a successor. */
+export interface BuilderPropagationTransition {
+  readonly id: string;
+  readonly conditionExpression: string | null;
+  readonly targetStateExpression: string;
+  readonly contributionExpression: string;
+}
+
+export type PropagationAggregationKind = "sum" | "minimum" | "maximum";
+
+/** The supported declarative scheduling abstraction for propagation. */
+export type PropagationScheduleKind = "state-space-order";
+
 export type ExecutionMode = "top-down" | "bottom-up";
 
 export interface BuilderState {
@@ -49,4 +69,21 @@ export interface BuilderState {
   readonly rootStateExpression: string;
   readonly answerExpression: string;
   readonly executionMode: ExecutionMode;
+}
+
+/**
+ * Builder representation for a propagation specification.
+ *
+ * It intentionally does not reuse functional base cases, recurrence
+ * transitions, root states, or execution modes.
+ */
+export interface PropagationBuilderState {
+  readonly metadata: BuilderState["metadata"];
+  readonly symbols: readonly BuilderSymbol[];
+  readonly state: BuilderState["state"];
+  readonly initialStates: readonly BuilderPropagationInitialState[];
+  readonly transitions: readonly BuilderPropagationTransition[];
+  readonly aggregation: PropagationAggregationKind;
+  readonly schedule: PropagationScheduleKind;
+  readonly answerExpression: string;
 }

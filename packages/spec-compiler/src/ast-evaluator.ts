@@ -9,6 +9,7 @@ export interface EvaluationScope {
   readonly stateBindings?: Readonly<Record<string, number>>;
   readonly constants: ReadonlyMap<string, MathNode>;
   readonly dpRead?: (state: StateCoordinates) => number;
+  readonly currentValue?: number;
 }
 
 export function evaluateMathNode(node: MathNode, scope: EvaluationScope): unknown {
@@ -98,6 +99,9 @@ function evaluateSymbol(node: MathNode, scope: EvaluationScope): unknown {
   }
   if (scope.stateBindings !== undefined && name in scope.stateBindings) {
     return scope.stateBindings[name];
+  }
+  if (name === "currentValue" && scope.currentValue !== undefined) {
+    return scope.currentValue;
   }
   if (scope.constants.has(name)) {
     return evaluateMathNode(scope.constants.get(name)!, scope);

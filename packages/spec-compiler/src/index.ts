@@ -5,6 +5,7 @@ export * from "./diagnostics";
 export * from "./parsed-specification";
 export * from "./parser";
 export * from "./problem-spec-generator";
+export * from "./propagation-problem-spec-generator";
 export * from "./runtime-input-parser";
 export * from "./semantic-validator";
 export * from "./symbol-table";

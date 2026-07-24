@@ -119,4 +119,45 @@ export interface FunctionalProblemSpec<Input = unknown> extends CompiledSpecific
  * session. The type reserves the model-specific branch while sharing only the
  * common compiled specification contract.
  */
-export type PropagationProblemSpec<Input = unknown> = CompiledSpecification<Input>;
+/** A seeded value present before propagation begins. */
+export interface PropagationInitialState {
+  readonly state: StateCoordinates;
+  readonly value: number;
+}
+
+/** An update emitted from a processed state to one successor. */
+export interface PropagationTransition {
+  readonly target: StateCoordinates;
+  readonly contribution: number;
+}
+
+/** Context available while a propagation state emits successor updates. */
+export interface PropagationTransitionContext<Input = unknown> {
+  readonly input: Input;
+  readonly value: number;
+}
+
+/** Combines a successor's current value with one incoming contribution. */
+export type PropagationAggregator<Input = unknown> = (
+  currentValue: number,
+  contribution: number,
+  target: StateCoordinates,
+  input: Input
+) => number;
+
+/**
+ * Declarative specification for state-to-successor propagation.
+ *
+ * A propagation runtime initializes seeds, processes states in `schedule`,
+ * emits successor transitions, and applies `aggregate` to each update.
+ */
+export interface PropagationProblemSpec<Input = unknown> extends CompiledSpecification<Input> {
+  initialStates(input: Input): Iterable<PropagationInitialState>;
+  transitions(
+    state: StateCoordinates,
+    context: PropagationTransitionContext<Input>
+  ): Iterable<PropagationTransition>;
+  aggregate: PropagationAggregator<Input>;
+  schedule(input: Input): Iterable<StateCoordinates>;
+  extractAnswer(context: ExtractionContext<Input>): number;
+}

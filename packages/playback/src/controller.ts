@@ -1,8 +1,12 @@
-import type { ExecutionTrace } from "@dp-explorer/core";
+import type { ExecutionTrace, PropagationExecutionTrace } from "@dp-explorer/core";
 
-import { buildExecutionFrame } from "./frame-builder";
-import type { ExecutionFrame } from "./frame";
-import type { PlaybackController, PlaybackControllerOptions } from "./playback-state";
+import { buildExecutionFrame, buildPropagationExecutionFrame } from "./frame-builder";
+import type { ExecutionFrame, PlaybackFrame, PropagationExecutionFrame } from "./frame";
+import type {
+  PlaybackController,
+  PlaybackControllerOptions,
+  PlaybackTrace
+} from "./playback-state";
 
 /**
  * Create a deterministic playback controller for an immutable execution trace.
@@ -12,15 +16,26 @@ import type { PlaybackController, PlaybackControllerOptions } from "./playback-s
  */
 export function createPlaybackController(
   trace: ExecutionTrace,
+  options?: PlaybackControllerOptions
+): PlaybackController<ExecutionFrame>;
+export function createPlaybackController(
+  trace: PropagationExecutionTrace,
+  options?: PlaybackControllerOptions
+): PlaybackController<PropagationExecutionFrame>;
+export function createPlaybackController(
+  trace: PlaybackTrace,
   options: PlaybackControllerOptions = {}
-): PlaybackController {
+): PlaybackController<PlaybackFrame> {
   if (trace.events.length === 0) {
     throw new Error("Cannot create a PlaybackController for an empty ExecutionTrace.");
   }
 
   let currentIndex = clampFrameIndex(options.initialIndex ?? 0, trace.events.length);
 
-  const frameAt = (index: number): ExecutionFrame => buildExecutionFrame(trace, index);
+  const frameAt = (index: number): PlaybackFrame =>
+    trace.mode === "propagation"
+      ? buildPropagationExecutionFrame(trace, index)
+      : buildExecutionFrame(trace, index);
 
   return Object.freeze({
     next: () => {

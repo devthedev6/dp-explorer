@@ -1,4 +1,4 @@
-import type { StateKey, TraceEvent, TraceEventId } from "@dp-explorer/core";
+import type { PropagationTraceEvent, StateKey, TraceEvent, TraceEventId } from "@dp-explorer/core";
 
 /**
  * Highlight role for a state in the current frame.
@@ -75,3 +75,41 @@ export interface ExecutionFrame {
   readonly isLast: boolean;
   readonly totalFrames: number;
 }
+
+/** One active propagation edge, including the contribution it carries. */
+export interface ActivePropagationTransition {
+  readonly processId: TraceEventId;
+  readonly source: StateKey;
+  readonly target: StateKey;
+  readonly contribution: number;
+}
+
+/** A state value established or changed by the current propagation event. */
+export interface PropagationUpdatedState {
+  readonly state: StateKey;
+  readonly previousValue: number | null;
+  readonly contribution: number | null;
+  readonly value: number;
+}
+
+/**
+ * Immutable playback snapshot for one propagation trace event.
+ *
+ * The fields are semantic execution facts. Rendering concerns remain outside
+ * playback.
+ */
+export interface PropagationExecutionFrame {
+  readonly frameIndex: number;
+  readonly currentEvent: PropagationTraceEvent;
+  readonly table: DPTableMetadata;
+  readonly dpSnapshot: ReadonlyMap<StateKey, number>;
+  readonly processedState: StateKey | null;
+  readonly activeTransition: ActivePropagationTransition | null;
+  readonly updatedState: PropagationUpdatedState | null;
+  readonly isFirst: boolean;
+  readonly isLast: boolean;
+  readonly totalFrames: number;
+}
+
+/** A frame emitted by one supported execution model. */
+export type PlaybackFrame = ExecutionFrame | PropagationExecutionFrame;

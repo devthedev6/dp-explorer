@@ -1,10 +1,16 @@
-import type { StateKey, TraceEvent, TraceEventId } from "@dp-explorer/core";
+import type {
+  PropagationExecutionTrace,
+  StateKey,
+  TraceEvent,
+  TraceEventId
+} from "@dp-explorer/core";
 import { EventType } from "@dp-explorer/core";
 import type { ExecutionTrace, ReadTraceEvent } from "@dp-explorer/core";
 
 import type {
   ExecutionFrame,
   HighlightedCell,
+  PropagationExecutionFrame,
   RecursionNode,
   RecursionNodeOutcome,
   RecursionTree
@@ -56,6 +62,112 @@ export function buildExecutionFrame(trace: ExecutionTrace, frameIndex: number): 
     isLast: currentEvent.type === EventType.Complete,
     totalFrames: trace.events.length
   });
+}
+
+interface PropagationReplayState {
+  readonly dpSnapshot: Map<StateKey, number>;
+  readonly processedState: StateKey | null;
+  readonly activeTransition: PropagationExecutionFrame["activeTransition"];
+  readonly updatedState: PropagationExecutionFrame["updatedState"];
+}
+
+/** Build the immutable propagation frame at `frameIndex` by replaying its trace. */
+export function buildPropagationExecutionFrame(
+  trace: PropagationExecutionTrace,
+  frameIndex: number
+): PropagationExecutionFrame {
+  if (trace.events.length === 0) {
+    throw new Error("Cannot build a PropagationExecutionFrame for an empty propagation trace.");
+  }
+
+  const clampedIndex = clampFrameIndex(frameIndex, trace.events.length);
+  const currentEvent = trace.events[clampedIndex];
+  if (currentEvent === undefined) {
+    throw new Error("Unable to resolve current event for PropagationExecutionFrame.");
+  }
+
+  const replay = replayPropagationThrough(trace, clampedIndex);
+  return freezePropagationFrame({
+    frameIndex: clampedIndex,
+    currentEvent,
+    table: Object.freeze({
+      stateVariables: Object.freeze([...trace.stateVariables]),
+      dimensions: Object.freeze([...trace.dimensions])
+    }),
+    dpSnapshot: freezeReadonlyMap(replay.dpSnapshot),
+    processedState: replay.processedState,
+    activeTransition: freezeActiveTransition(replay.activeTransition),
+    updatedState: freezeUpdatedState(replay.updatedState),
+    isFirst: clampedIndex === 0,
+    isLast: currentEvent.type === EventType.Complete,
+    totalFrames: trace.events.length
+  });
+}
+
+function replayPropagationThrough(
+  trace: PropagationExecutionTrace,
+  frameIndex: number
+): PropagationReplayState {
+  const dpSnapshot = new Map<StateKey, number>();
+  let processedState: StateKey | null = null;
+  let activeTransition: PropagationExecutionFrame["activeTransition"] = null;
+  let updatedState: PropagationExecutionFrame["updatedState"] = null;
+
+  for (let index = 0; index <= frameIndex; index += 1) {
+    const event = trace.events[index];
+    if (event === undefined) {
+      throw new Error("Propagation trace replay moved beyond available events.");
+    }
+
+    activeTransition = null;
+    updatedState = null;
+
+    switch (event.type) {
+      case EventType.PropagationSeed:
+        dpSnapshot.set(event.state, event.value);
+        updatedState = {
+          state: event.state,
+          previousValue: null,
+          contribution: null,
+          value: event.value
+        };
+        break;
+      case EventType.PropagationProcess:
+        processedState = event.state;
+        break;
+      case EventType.PropagationTransition:
+        activeTransition = {
+          processId: event.processId,
+          source: event.source,
+          target: event.target,
+          contribution: event.contribution
+        };
+        break;
+      case EventType.PropagationUpdate:
+        activeTransition = {
+          processId: event.processId,
+          source: event.source,
+          target: event.target,
+          contribution: event.contribution
+        };
+        dpSnapshot.set(event.target, event.updatedValue);
+        updatedState = {
+          state: event.target,
+          previousValue: event.previousValue,
+          contribution: event.contribution,
+          value: event.updatedValue
+        };
+        break;
+      case EventType.PropagationComplete:
+        processedState = event.state;
+        break;
+      case EventType.Complete:
+        processedState = null;
+        break;
+    }
+  }
+
+  return { dpSnapshot, processedState, activeTransition, updatedState };
 }
 
 function replayThrough(trace: ExecutionTrace, frameIndex: number): ReplayState {
@@ -230,6 +342,22 @@ function clampFrameIndex(index: number, totalFrames: number): number {
 
 function freezeFrame(frame: ExecutionFrame): ExecutionFrame {
   return Object.freeze(frame);
+}
+
+function freezePropagationFrame(frame: PropagationExecutionFrame): PropagationExecutionFrame {
+  return Object.freeze(frame);
+}
+
+function freezeActiveTransition(
+  transition: PropagationExecutionFrame["activeTransition"]
+): PropagationExecutionFrame["activeTransition"] {
+  return transition === null ? null : Object.freeze({ ...transition });
+}
+
+function freezeUpdatedState(
+  updatedState: PropagationExecutionFrame["updatedState"]
+): PropagationExecutionFrame["updatedState"] {
+  return updatedState === null ? null : Object.freeze({ ...updatedState });
 }
 
 function freezeRecursionNode(node: RecursionNode): RecursionNode {

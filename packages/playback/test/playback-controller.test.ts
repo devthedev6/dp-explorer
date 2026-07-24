@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { ExecutionTrace, TraceEvent } from "@dp-explorer/core";
+import type {
+  ExecutionTrace,
+  PropagationExecutionTrace,
+  PropagationTraceEvent,
+  TraceEvent
+} from "@dp-explorer/core";
 import { EventType, toStateKey } from "@dp-explorer/core";
 
 import { createPlaybackController } from "../src";
@@ -168,6 +173,83 @@ describe("createPlaybackController", () => {
     expect(frame.activeNodeId).toBeNull();
     expect(frame.highlightedCells).toEqual([{ state: s1, role: "base-case" }]);
   });
+
+  it("replays propagation events into processing, transition, and update frame state", () => {
+    const controller = createPlaybackController(propagationTrace);
+
+    const seed = controller.currentFrame();
+    const process = controller.next();
+    const transition = controller.next();
+    const update = controller.next();
+    const complete = controller.seek(propagationTrace.events.length - 1);
+
+    expect(seed.currentEvent.type).toBe(EventType.PropagationSeed);
+    expect([...seed.dpSnapshot.entries()]).toEqual([[s0, 1]]);
+    expect(seed.processedState).toBeNull();
+    expect(seed.activeTransition).toBeNull();
+    expect(seed.updatedState).toEqual({
+      state: s0,
+      previousValue: null,
+      contribution: null,
+      value: 1
+    });
+
+    expect(process.currentEvent.type).toBe(EventType.PropagationProcess);
+    expect(process.processedState).toBe(s0);
+    expect(process.activeTransition).toBeNull();
+    expect(process.updatedState).toBeNull();
+
+    expect(transition.currentEvent.type).toBe(EventType.PropagationTransition);
+    expect(transition.processedState).toBe(s0);
+    expect(transition.activeTransition).toEqual({
+      processId: 1,
+      source: s0,
+      target: s1,
+      contribution: 1
+    });
+    expect(transition.updatedState).toBeNull();
+
+    expect(update.currentEvent.type).toBe(EventType.PropagationUpdate);
+    expect([...update.dpSnapshot.entries()]).toEqual([
+      [s0, 1],
+      [s1, 1]
+    ]);
+    expect(update.activeTransition?.target).toBe(s1);
+    expect(update.updatedState).toEqual({
+      state: s1,
+      previousValue: null,
+      contribution: 1,
+      value: 1
+    });
+
+    expect(complete.currentEvent.type).toBe(EventType.Complete);
+    expect(complete.processedState).toBeNull();
+    expect(complete.activeTransition).toBeNull();
+    expect(complete.updatedState).toBeNull();
+    expect(complete.isLast).toBe(true);
+  });
+
+  it("supports deterministic propagation navigation with next, previous, and seek", () => {
+    const controller = createPlaybackController(propagationTrace);
+
+    expect(controller.next().frameIndex).toBe(1);
+    expect(controller.next().frameIndex).toBe(2);
+    expect(controller.previous().frameIndex).toBe(1);
+    expect(controller.seek(3.9).frameIndex).toBe(3);
+    expect(controller.seek(-1).frameIndex).toBe(0);
+    expect(controller.seek(999).frameIndex).toBe(propagationTrace.events.length - 1);
+
+    const direct = createPlaybackController(propagationTrace).seek(8);
+    controller.seek(2);
+    controller.next();
+    const replayed = controller.seek(8);
+
+    expect(replayed).toEqual(direct);
+    expect(replayed).not.toBe(direct);
+    expect(Object.isFrozen(replayed)).toBe(true);
+    expect(Object.isFrozen(replayed.activeTransition)).toBe(true);
+    expect(Object.isFrozen(replayed.updatedState)).toBe(true);
+  });
 });
 
 const topDownTrace = freezeTrace({
@@ -216,7 +298,72 @@ const bottomUpTrace = freezeTrace({
   ].map((event) => Object.freeze(event)) as readonly TraceEvent[]
 });
 
+const propagationTrace = freezePropagationTrace({
+  problemId: "propagation-counting",
+  mode: "propagation",
+  input: Object.freeze({ n: 2 }),
+  stateVariables: Object.freeze(["i"]),
+  dimensions: Object.freeze([3]),
+  events: [
+    { id: 0, type: EventType.PropagationSeed, state: s0, value: 1 },
+    { id: 1, type: EventType.PropagationProcess, state: s0, value: 1 },
+    {
+      id: 2,
+      type: EventType.PropagationTransition,
+      processId: 1,
+      source: s0,
+      target: s1,
+      contribution: 1
+    },
+    {
+      id: 3,
+      type: EventType.PropagationUpdate,
+      processId: 1,
+      source: s0,
+      target: s1,
+      previousValue: null,
+      contribution: 1,
+      updatedValue: 1,
+      operation: "initialize"
+    },
+    { id: 4, type: EventType.PropagationComplete, processId: 1, state: s0, value: 1 },
+    { id: 5, type: EventType.PropagationProcess, state: s1, value: 1 },
+    {
+      id: 6,
+      type: EventType.PropagationTransition,
+      processId: 5,
+      source: s1,
+      target: s2,
+      contribution: 1
+    },
+    {
+      id: 7,
+      type: EventType.PropagationUpdate,
+      processId: 5,
+      source: s1,
+      target: s2,
+      previousValue: null,
+      contribution: 1,
+      updatedValue: 1,
+      operation: "initialize"
+    },
+    { id: 8, type: EventType.PropagationComplete, processId: 5, state: s1, value: 1 },
+    { id: 9, type: EventType.PropagationProcess, state: s2, value: 1 },
+    { id: 10, type: EventType.PropagationComplete, processId: 9, state: s2, value: 1 },
+    { id: 11, type: EventType.Complete, answer: 1 }
+  ].map((event) => Object.freeze(event)) as readonly PropagationTraceEvent[]
+});
+
 function freezeTrace<Input>(trace: ExecutionTrace<Input>): ExecutionTrace<Input> {
+  return Object.freeze({
+    ...trace,
+    events: Object.freeze([...trace.events])
+  });
+}
+
+function freezePropagationTrace<Input>(
+  trace: PropagationExecutionTrace<Input>
+): PropagationExecutionTrace<Input> {
   return Object.freeze({
     ...trace,
     events: Object.freeze([...trace.events])

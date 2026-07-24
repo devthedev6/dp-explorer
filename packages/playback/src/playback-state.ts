@@ -1,6 +1,8 @@
-import type { ExecutionTrace } from "@dp-explorer/core";
+import type { ExecutionTrace, PropagationExecutionTrace } from "@dp-explorer/core";
 
-import type { ExecutionFrame } from "./frame";
+import type { ExecutionFrame, PlaybackFrame } from "./frame";
+
+export type PlaybackTrace = ExecutionTrace | PropagationExecutionTrace;
 
 /**
  * Immutable state owned by a playback controller or caller.
@@ -8,10 +10,13 @@ import type { ExecutionFrame } from "./frame";
  * It joins the trace, current index, and current frame without timers,
  * transport status, UI lifecycle, or visualization concerns.
  */
-export interface PlaybackState {
-  readonly trace: ExecutionTrace;
+export interface PlaybackState<
+  Trace extends PlaybackTrace = ExecutionTrace,
+  Frame extends PlaybackFrame = ExecutionFrame
+> {
+  readonly trace: Trace;
   readonly currentIndex: number;
-  readonly frame: ExecutionFrame;
+  readonly frame: Frame;
 }
 
 /**
@@ -24,9 +29,9 @@ export interface PlaybackControllerOptions {
 /**
  * Pure navigation contract over an execution trace.
  */
-export interface PlaybackController {
-  next(): ExecutionFrame;
-  previous(): ExecutionFrame;
-  seek(index: number): ExecutionFrame;
-  currentFrame(): ExecutionFrame;
+export interface PlaybackController<Frame extends PlaybackFrame = ExecutionFrame> {
+  next(): Frame;
+  previous(): Frame;
+  seek(index: number): Frame;
+  currentFrame(): Frame;
 }

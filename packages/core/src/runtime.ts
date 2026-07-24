@@ -7,7 +7,8 @@ import type { CompiledSpecification } from "./problem-spec";
  */
 export abstract class Runtime<
   Input = unknown,
-  Specification extends CompiledSpecification<Input> = CompiledSpecification<Input>
+  Specification extends CompiledSpecification<Input> = CompiledSpecification<Input>,
+  Result = ExecutionResult<Input>
 > {
-  abstract execute(specification: Specification, input: Input): ExecutionResult<Input>;
+  abstract execute(specification: Specification, input: Input): Result;
 }

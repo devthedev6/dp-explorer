@@ -67,8 +67,8 @@ describe("PropagationRuntime", () => {
       ["2", 5]
     ]);
     expect(result.trace.events.slice(0, 2)).toEqual([
-      { id: 0, type: EventType.Write, state: "0", value: 2 },
-      { id: 1, type: EventType.Write, state: "1", value: 3 }
+      { id: 0, type: EventType.PropagationSeed, state: "0", value: 2 },
+      { id: 1, type: EventType.PropagationSeed, state: "1", value: 3 }
     ]);
   });
 
@@ -94,7 +94,81 @@ describe("PropagationRuntime", () => {
       ["2", 3]
     ]);
     expect(result.trace.mode).toBe("propagation");
-    expect(result.trace.events.filter((event) => event.type === EventType.Write)).toHaveLength(3);
+    expect(
+      result.trace.events.filter((event) => event.type === EventType.PropagationTransition)
+    ).toHaveLength(2);
+  });
+
+  it("emits a complete, ordered lifecycle for each propagated contribution", () => {
+    const result = runtime.execute(createCountingSpec(), { steps: 2 });
+
+    expect(result.trace.events).toEqual([
+      { id: 0, type: EventType.PropagationSeed, state: "0", value: 1 },
+      { id: 1, type: EventType.PropagationProcess, state: "0", value: 1 },
+      {
+        id: 2,
+        type: EventType.PropagationTransition,
+        processId: 1,
+        source: "0",
+        target: "1",
+        contribution: 1
+      },
+      {
+        id: 3,
+        type: EventType.PropagationUpdate,
+        processId: 1,
+        source: "0",
+        target: "1",
+        previousValue: null,
+        contribution: 1,
+        updatedValue: 1,
+        operation: "initialize"
+      },
+      {
+        id: 4,
+        type: EventType.PropagationTransition,
+        processId: 1,
+        source: "0",
+        target: "2",
+        contribution: 1
+      },
+      {
+        id: 5,
+        type: EventType.PropagationUpdate,
+        processId: 1,
+        source: "0",
+        target: "2",
+        previousValue: null,
+        contribution: 1,
+        updatedValue: 1,
+        operation: "initialize"
+      },
+      { id: 6, type: EventType.PropagationComplete, processId: 1, state: "0", value: 1 },
+      { id: 7, type: EventType.PropagationProcess, state: "1", value: 1 },
+      {
+        id: 8,
+        type: EventType.PropagationTransition,
+        processId: 7,
+        source: "1",
+        target: "2",
+        contribution: 1
+      },
+      {
+        id: 9,
+        type: EventType.PropagationUpdate,
+        processId: 7,
+        source: "1",
+        target: "2",
+        previousValue: 1,
+        contribution: 1,
+        updatedValue: 2,
+        operation: "aggregate"
+      },
+      { id: 10, type: EventType.PropagationComplete, processId: 7, state: "1", value: 1 },
+      { id: 11, type: EventType.PropagationProcess, state: "2", value: 2 },
+      { id: 12, type: EventType.PropagationComplete, processId: 11, state: "2", value: 2 },
+      { id: 13, type: EventType.Complete, answer: 2 }
+    ]);
   });
 });
 

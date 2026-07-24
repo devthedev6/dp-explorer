@@ -1,10 +1,10 @@
 import { createExtractionContextFromTable } from "./extraction-context";
-import type { ExecutionResult } from "./execution-result";
+import type { FrozenDpTable } from "./execution-result";
 import { freezeDpTable } from "./execution-result";
 import type { PropagationProblemSpec } from "./problem-spec";
 import { Runtime } from "./runtime";
 import { toStateKey } from "./state-key";
-import type { ExecutionTrace, TraceEvent, TraceEventId } from "./trace";
+import type { PropagationExecutionTrace, PropagationTraceEvent, TraceEventId } from "./trace";
 import { EventType } from "./trace";
 
 /**
@@ -16,15 +16,19 @@ import { EventType } from "./trace";
  */
 export class PropagationRuntime<Input = unknown> extends Runtime<
   Input,
-  PropagationProblemSpec<Input>
+  PropagationProblemSpec<Input>,
+  PropagationExecutionResult<Input>
 > {
-  execute(specification: PropagationProblemSpec<Input>, input: Input): ExecutionResult<Input> {
-    const events: TraceEvent[] = [];
+  execute(
+    specification: PropagationProblemSpec<Input>,
+    input: Input
+  ): PropagationExecutionResult<Input> {
+    const events: PropagationTraceEvent[] = [];
     const table = new Map<ReturnType<typeof toStateKey>, number>();
     const inputSnapshot = deepFreeze(cloneInput(input));
 
     const nextId = (): TraceEventId => events.length;
-    const emit = <TEvent extends TraceEvent>(event: TEvent): TEvent => {
+    const emit = <TEvent extends PropagationTraceEvent>(event: TEvent): TEvent => {
       const frozenEvent = Object.freeze(event) as TEvent;
       events.push(frozenEvent);
       return frozenEvent;
@@ -35,7 +39,7 @@ export class PropagationRuntime<Input = unknown> extends Runtime<
       table.set(stateKey, initialState.value);
       emit({
         id: nextId(),
-        type: EventType.Write,
+        type: EventType.PropagationSeed,
         state: stateKey,
         value: initialState.value
       });
@@ -51,11 +55,10 @@ export class PropagationRuntime<Input = unknown> extends Runtime<
         continue;
       }
 
-      emit({
+      const process = emit({
         id: nextId(),
-        type: EventType.Transition,
+        type: EventType.PropagationProcess,
         state: stateKey,
-        usedReads: Object.freeze([]),
         value: currentValue
       });
 
@@ -65,6 +68,15 @@ export class PropagationRuntime<Input = unknown> extends Runtime<
       })) {
         const targetKey = toStateKey(transition.target);
         const previousValue = table.get(targetKey);
+        emit({
+          id: nextId(),
+          type: EventType.PropagationTransition,
+          processId: process.id,
+          source: stateKey,
+          target: targetKey,
+          contribution: transition.contribution
+        });
+
         const nextValue =
           previousValue === undefined
             ? transition.contribution
@@ -78,11 +90,24 @@ export class PropagationRuntime<Input = unknown> extends Runtime<
         table.set(targetKey, nextValue);
         emit({
           id: nextId(),
-          type: EventType.Write,
-          state: targetKey,
-          value: nextValue
+          type: EventType.PropagationUpdate,
+          processId: process.id,
+          source: stateKey,
+          target: targetKey,
+          previousValue: previousValue ?? null,
+          contribution: transition.contribution,
+          updatedValue: nextValue,
+          operation: previousValue === undefined ? "initialize" : "aggregate"
         });
       }
+
+      emit({
+        id: nextId(),
+        type: EventType.PropagationComplete,
+        processId: process.id,
+        state: stateKey,
+        value: table.get(stateKey) ?? currentValue
+      });
     }
 
     const dimensions = Object.freeze([...specification.dimensions(input)]);
@@ -103,10 +128,16 @@ export class PropagationRuntime<Input = unknown> extends Runtime<
       stateVariables: Object.freeze([...specification.stateVariables]),
       dimensions,
       events: Object.freeze([...events])
-    } satisfies ExecutionTrace<Input>);
+    } satisfies PropagationExecutionTrace<Input>);
 
     return Object.freeze({ trace, dpTable });
   }
+}
+
+/** Result of executing a propagation specification. */
+export interface PropagationExecutionResult<Input = unknown> {
+  readonly trace: PropagationExecutionTrace<Input>;
+  readonly dpTable: FrozenDpTable;
 }
 
 function cloneInput<Input>(input: Input): Input {

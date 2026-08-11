@@ -1,5 +1,10 @@
 import type { PlaybackFrame } from "@dp-explorer/playback";
 
+import {
+  formatPropagationLifecycle,
+  getPropagationEventPresentation,
+  isPropagationFrame
+} from "./propagation-presentation";
 import "./playback-timeline.css";
 
 export interface PlaybackTimelineProps {
@@ -17,6 +22,13 @@ export interface PlaybackTimelineProps {
  */
 export function PlaybackTimeline({ frame, onSeek }: PlaybackTimelineProps) {
   const lastIndex = frame.totalFrames - 1;
+  const propagationPresentation = isPropagationFrame(frame)
+    ? getPropagationEventPresentation(frame)
+    : null;
+  const lifecycle =
+    propagationPresentation === null
+      ? null
+      : formatPropagationLifecycle(propagationPresentation.processId);
 
   return (
     <section aria-label="Playback timeline" className="playback-timeline">
@@ -46,6 +58,16 @@ export function PlaybackTimeline({ frame, onSeek }: PlaybackTimelineProps) {
       <output className="playback-timeline-position" data-testid="timeline-position">
         {frame.frameIndex + 1} / {frame.totalFrames}
       </output>
+      {propagationPresentation && (
+        <div
+          className="playback-timeline-event"
+          data-event-tone={propagationPresentation.tone}
+          data-testid="propagation-timeline-event"
+        >
+          <span data-testid="propagation-timeline-label">{propagationPresentation.label}</span>
+          {lifecycle && <strong data-testid="propagation-timeline-lifecycle">{lifecycle}</strong>}
+        </div>
+      )}
     </section>
   );
 }

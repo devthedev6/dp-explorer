@@ -168,8 +168,24 @@
   background: #0f172a;
 }
 
+.app-shell--propagation {
+  grid-template-rows: auto auto auto auto;
+}
+
+.app-propagation-flow {
+  grid-area: tree;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
 .app-recursion-tree > * {
   height: 100%;
+}
+
+.app-propagation-flow > * {
+  min-height: 100%;
 }
 
 .app-recursion-tree .recursion-tree-panel {
@@ -223,5 +239,9 @@
       "timeline";
     grid-template-columns: 1fr;
     grid-template-rows: auto 400px auto auto auto;
+  }
+
+  .app-shell--propagation {
+    grid-template-rows: auto auto auto auto auto;
   }
 }

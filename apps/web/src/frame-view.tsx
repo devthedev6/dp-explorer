@@ -1,6 +1,7 @@
 import type { ExecutionFrame, PlaybackFrame } from "@dp-explorer/playback";
 
 import { DPTable } from "./dp-table";
+import { getPropagationEventPresentation, isPropagationFrame } from "./propagation-presentation";
 import { PropagationTransitionView } from "./propagation-transition";
 import { RecursionTreeView } from "./recursion-tree";
 
@@ -14,6 +15,10 @@ export interface FrameViewProps {
  * It consumes only playback frame data and never reads the underlying trace.
  */
 export function FrameView({ frame }: FrameViewProps) {
+  const propagationPresentation = isPropagationFrame(frame)
+    ? getPropagationEventPresentation(frame)
+    : null;
+
   return (
     <section aria-label="Current execution frame">
       <dl>
@@ -25,7 +30,9 @@ export function FrameView({ frame }: FrameViewProps) {
         </div>
         <div>
           <dt>Current event</dt>
-          <dd data-testid="event-type">{frame.currentEvent.type}</dd>
+          <dd data-testid="event-type">
+            {propagationPresentation?.label ?? frame.currentEvent.type}
+          </dd>
         </div>
         <div>
           <dt>Current state</dt>

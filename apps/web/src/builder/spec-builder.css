@@ -490,6 +490,10 @@
   gap: 1rem;
 }
 
+.builder-playback--propagation {
+  grid-template-rows: auto auto auto;
+}
+
 .builder-playback-tree {
   grid-area: tree;
   min-width: 0;
@@ -498,8 +502,20 @@
   background: #0f172a;
 }
 
+.builder-playback-flow {
+  grid-area: tree;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
 .builder-playback-tree > * {
   height: 100%;
+}
+
+.builder-playback-flow > * {
+  min-height: 100%;
 }
 
 .builder-playback-tree .recursion-tree-panel {
@@ -542,6 +558,10 @@
       "timeline";
     grid-template-columns: 1fr;
     grid-template-rows: 360px auto auto auto;
+  }
+
+  .builder-playback--propagation {
+    grid-template-rows: auto auto auto auto;
   }
 }
 

@@ -60,6 +60,11 @@
   background: #f97316;
 }
 
+.dp-table-cell[data-model="propagation"][data-role="active"] {
+  background: #ea580c;
+  box-shadow: inset 0 0 0 3px #fff7ed;
+}
+
 .dp-table-cell[data-role="dependency"] {
   color: #0f172a;
   background: #38bdf8;
@@ -72,11 +77,21 @@
   outline-offset: -3px;
 }
 
+.dp-table-cell[data-model="propagation"][data-role="updated"] {
+  background: #bbf7d0;
+  outline-color: #22c55e;
+}
+
 .dp-table-cell[data-role="transition-target"] {
   color: #0f172a;
   background: #67e8f9;
   outline: 2px dashed #facc15;
   outline-offset: -4px;
+}
+
+.dp-table-cell[data-model="propagation"][data-role="transition-target"] {
+  background: #e0f2fe;
+  outline-color: #0284c7;
 }
 
 .dp-table-cell[data-role="base-case"] {

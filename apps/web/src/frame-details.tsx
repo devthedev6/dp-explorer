@@ -1,6 +1,12 @@
 import { EventType } from "@dp-explorer/core";
 import type { PlaybackFrame, PropagationExecutionFrame } from "@dp-explorer/playback";
 
+import {
+  formatPropagationLifecycle,
+  formatPropagationValue,
+  getPropagationEventPresentation,
+  isPropagationFrame
+} from "./propagation-presentation";
 import "./frame-details.css";
 
 export interface FrameDetailsProps {
@@ -8,6 +14,10 @@ export interface FrameDetailsProps {
 }
 
 export function FrameDetails({ frame }: FrameDetailsProps) {
+  const propagationPresentation = isPropagationFrame(frame)
+    ? getPropagationEventPresentation(frame)
+    : null;
+
   return (
     <section className="frame-details" aria-label="Current execution frame">
       <dl>
@@ -19,7 +29,9 @@ export function FrameDetails({ frame }: FrameDetailsProps) {
         </div>
         <div>
           <dt>Current event</dt>
-          <dd data-testid="event-type">{frame.currentEvent.type}</dd>
+          <dd data-testid="event-type" data-event-tone={propagationPresentation?.tone}>
+            {propagationPresentation?.label ?? frame.currentEvent.type}
+          </dd>
         </div>
         <div>
           <dt>Current state</dt>
@@ -47,10 +59,21 @@ export function FrameDetails({ frame }: FrameDetailsProps) {
 
 function PropagationDetails({ frame }: { readonly frame: PropagationExecutionFrame }) {
   const event = frame.currentEvent;
+  const presentation = getPropagationEventPresentation(frame);
+  const lifecycle = formatPropagationLifecycle(presentation.processId);
 
   return (
-    <section>
+    <section className="propagation-details">
       <h2>Propagation event</h2>
+      <div
+        className="propagation-event-summary"
+        data-event-tone={presentation.tone}
+        data-testid="propagation-event-summary"
+      >
+        <span>{presentation.label}</span>
+        <p>{presentation.summary}</p>
+        {lifecycle && <strong data-testid="propagation-process-lifecycle">{lifecycle}</strong>}
+      </div>
       <dl className="frame-details-nested">
         <div>
           <dt>Processed state</dt>
@@ -102,12 +125,54 @@ function PropagationDetails({ frame }: { readonly frame: PropagationExecutionFra
           <dt>Aggregation operation</dt>
           <dd data-testid="aggregation-operation">
             {event.type === EventType.PropagationUpdate && event.operation === "aggregate"
-              ? "aggregate"
+              ? "Not specified by frame"
               : "N/A"}
           </dd>
         </div>
       </dl>
+      {event.type === EventType.PropagationUpdate && <PropagationUpdateEquation frame={frame} />}
     </section>
+  );
+}
+
+function PropagationUpdateEquation({ frame }: { readonly frame: PropagationExecutionFrame }) {
+  const event = frame.currentEvent;
+
+  if (event.type !== EventType.PropagationUpdate) {
+    return null;
+  }
+
+  const isInitialization = event.operation === "initialize";
+
+  return (
+    <div
+      className="propagation-update-equation"
+      data-mode={event.operation}
+      data-testid="propagation-update-equation"
+    >
+      <span className="propagation-equation-term">
+        <span>{isInitialization ? "Previous value" : "Previous"}</span>
+        <strong data-testid="equation-previous">
+          {formatPropagationValue(event.previousValue)}
+        </strong>
+      </span>
+      <span className="propagation-equation-operator" aria-hidden="true">
+        {isInitialization ? "-&gt;" : "+"}
+      </span>
+      <span className="propagation-equation-term">
+        <span>{isInitialization ? "Contribution" : "Contribution"}</span>
+        <strong data-testid="equation-contribution">{event.contribution}</strong>
+      </span>
+      {!isInitialization && (
+        <span className="propagation-equation-operator" aria-hidden="true">
+          -&gt;
+        </span>
+      )}
+      <span className="propagation-equation-term propagation-equation-term--result">
+        <span>Updated value</span>
+        <strong data-testid="equation-result">{event.updatedValue}</strong>
+      </span>
+    </div>
   );
 }
 
@@ -123,9 +188,5 @@ function formatNullableNumber(value: number | null): string | number {
 }
 
 function formatOperation(operation: "initialize" | "aggregate"): string {
-  return operation === "initialize" ? "initialized" : "aggregated";
-}
-
-function isPropagationFrame(frame: PlaybackFrame): frame is PropagationExecutionFrame {
-  return "processedState" in frame;
+  return operation === "initialize" ? "Initialization" : "Aggregation";
 }

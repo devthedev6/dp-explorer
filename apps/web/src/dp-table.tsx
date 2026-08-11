@@ -1,6 +1,7 @@
-import type { ExecutionFrame, HighlightRole, PlaybackFrame } from "@dp-explorer/playback";
+import type { HighlightRole, PlaybackFrame } from "@dp-explorer/playback";
 import { toStateKey } from "@dp-explorer/core";
 
+import { isPropagationFrame } from "./propagation-presentation";
 import "./dp-table.css";
 
 export interface DPTableProps {
@@ -14,6 +15,8 @@ interface CellViewModel {
   readonly label: string;
   readonly value: number | null;
   readonly role: CellRole | null;
+  readonly executionModel: "functional" | "propagation";
+  readonly roleLabel: string | null;
 }
 
 /**
@@ -76,7 +79,7 @@ function OneDimensionalTable({ frame }: DPTableProps) {
           </tbody>
         </table>
       </div>
-      <DPTableLegend />
+      <DPTableLegend propagation={isPropagationFrame(frame)} />
     </section>
   );
 }
@@ -118,13 +121,14 @@ function TwoDimensionalTable({ frame }: DPTableProps) {
           </tbody>
         </table>
       </div>
-      <DPTableLegend />
+      <DPTableLegend propagation={isPropagationFrame(frame)} />
     </section>
   );
 }
 
 function DPCell({ cell }: { readonly cell: CellViewModel }) {
   const status = cell.value === null ? "unknown" : "computed";
+  const roleDescription = cell.roleLabel ? `, ${cell.roleLabel}` : "";
 
   return (
     <td
@@ -132,18 +136,19 @@ function DPCell({ cell }: { readonly cell: CellViewModel }) {
       data-state={cell.state}
       data-status={status}
       data-role={cell.role ?? "none"}
-      aria-label={`${cell.label}: ${cell.value ?? "unknown"}`}
+      data-model={cell.executionModel}
+      aria-label={`${cell.label}: ${cell.value ?? "unknown"}${roleDescription}`}
     >
       {cell.value ?? "?"}
     </td>
   );
 }
 
-function DPTableLegend() {
+function DPTableLegend({ propagation }: { readonly propagation: boolean }) {
   return (
     <ul className="dp-table-legend" aria-label="DP table legend">
-      <LegendItem label="Active" role="active" />
-      <LegendItem label="Updated" role="updated" />
+      <LegendItem label={propagation ? "Processing Source" : "Active"} role="active" />
+      <LegendItem label={propagation ? "Updated Target" : "Updated"} role="updated" />
       <LegendItem label="Transition Target" role="transition-target" />
       <LegendItem label="Dependency" role="dependency" />
       <LegendItem label="Base Case" role="base-case" />
@@ -164,11 +169,15 @@ function LegendItem({ label, role }: { readonly label: string; readonly role: st
 
 function cellFor(frame: PlaybackFrame, coordinates: readonly number[]): CellViewModel {
   const state = toStateKey(coordinates);
+  const role = roleFor(frame, state);
+  const propagation = isPropagationFrame(frame);
   return {
     state,
     label: formatCoordinates(coordinates),
     value: frame.dpSnapshot.get(state) ?? null,
-    role: roleFor(frame, state)
+    role,
+    executionModel: propagation ? "propagation" : "functional",
+    roleLabel: propagation ? propagationRoleLabel(role) : null
   };
 }
 
@@ -192,8 +201,11 @@ function roleFor(frame: PlaybackFrame, state: string): CellRole | null {
   return null;
 }
 
-function isPropagationFrame(frame: PlaybackFrame): frame is Exclude<PlaybackFrame, ExecutionFrame> {
-  return "processedState" in frame;
+function propagationRoleLabel(role: CellRole | null): string | null {
+  if (role === "active") return "processing source";
+  if (role === "updated") return "updated target";
+  if (role === "transition-target") return "transition target";
+  return null;
 }
 
 function formatCoordinates(coordinates: readonly number[]): string {

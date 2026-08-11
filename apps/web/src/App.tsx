@@ -8,6 +8,7 @@ import { createDemoSession } from "./demo-session";
 import { FrameDetails } from "./frame-details";
 import { PlaybackTimeline } from "./playback-timeline";
 import { DPTable } from "./dp-table";
+import { isPropagationFrame } from "./propagation-presentation";
 import { PropagationTransitionView } from "./propagation-transition";
 import { RecursionTreeView } from "./recursion-tree";
 import { SpecificationBuilderPage } from "./builder";
@@ -168,8 +169,10 @@ export function App() {
     return <SpecificationBuilderPage onExit={() => setMode("templates")} />;
   }
 
+  const propagationFrame = isPropagationFrame(frame);
+
   return (
-    <main className="app-shell">
+    <main className={`app-shell${propagationFrame ? " app-shell--propagation" : ""}`}>
       <header className="app-header">
         <h1>DP Explorer</h1>
         <p>Template verification shell</p>
@@ -205,7 +208,10 @@ export function App() {
         </fieldset>
       </header>
 
-      <section className="app-recursion-tree" aria-label="Recursion tree">
+      <section
+        className={propagationFrame ? "app-propagation-flow" : "app-recursion-tree"}
+        aria-label={propagationFrame ? "Propagation flow" : "Recursion tree"}
+      >
         {isFunctionalFrame(frame) ? <RecursionTreeView frame={frame} /> : null}
         <PropagationTransitionView frame={frame} />
       </section>

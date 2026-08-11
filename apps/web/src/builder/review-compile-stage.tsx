@@ -13,6 +13,7 @@ import { DPTable } from "../dp-table";
 import { createProblemSpecSession, type DemoSession } from "../demo-session";
 import { FrameDetails } from "../frame-details";
 import { PlaybackTimeline } from "../playback-timeline";
+import { isPropagationFrame } from "../propagation-presentation";
 import { PropagationTransitionView } from "../propagation-transition";
 import { RecursionTreeView } from "../recursion-tree";
 import type { BuilderSymbol } from "./builder-state";
@@ -190,8 +191,22 @@ export function ReviewCompileStage() {
                 <h4>Answer</h4>
                 <output>{execution.session.answer}</output>
               </section>
-              <section className="builder-playback" aria-label="Compiled specification playback">
-                <section className="builder-playback-tree" aria-label="Recursion tree">
+              <section
+                className={`builder-playback${
+                  isPropagationFrame(execution.frame) ? " builder-playback--propagation" : ""
+                }`}
+                aria-label="Compiled specification playback"
+              >
+                <section
+                  className={
+                    isPropagationFrame(execution.frame)
+                      ? "builder-playback-flow"
+                      : "builder-playback-tree"
+                  }
+                  aria-label={
+                    isPropagationFrame(execution.frame) ? "Propagation flow" : "Recursion tree"
+                  }
+                >
                   {isFunctionalFrame(execution.frame) ? (
                     <RecursionTreeView frame={execution.frame} />
                   ) : (

@@ -7,6 +7,7 @@ import { createDemoSession, createProblemSpecSession } from "../src/demo-session
 
 const fibonacciTemplate = templateRegistry.get("fibonacci");
 const lcsTemplate = templateRegistry.get("longest-common-subsequence");
+const gridPathsTemplate = templateRegistry.get("grid-paths-propagation");
 
 if (fibonacciTemplate === undefined) {
   throw new Error("Fibonacci template is not registered.");
@@ -14,6 +15,10 @@ if (fibonacciTemplate === undefined) {
 
 if (lcsTemplate === undefined) {
   throw new Error("LCS template is not registered.");
+}
+
+if (gridPathsTemplate === undefined) {
+  throw new Error("2D Grid Paths template is not registered.");
 }
 
 describe("createDemoSession", () => {
@@ -92,6 +97,17 @@ describe("createDemoSession", () => {
     const completeEvent = session.currentFrame().currentEvent;
     expect(completeEvent.type).toBe("COMPLETE");
     expect("answer" in completeEvent ? completeEvent.answer : null).toBe(3);
+  });
+
+  it("runs a registered propagation template through the propagation playback path", () => {
+    const session = createDemoSession(gridPathsTemplate);
+
+    expect(session.answer).toBe(6);
+    expect(session.currentFrame().currentEvent.type).toBe("PROPAGATION_SEED");
+    expect(session.currentFrame().table.dimensions).toEqual([3, 3]);
+
+    const lastFrame = session.controller.seek(session.currentFrame().totalFrames - 1);
+    expect(lastFrame.currentEvent).toMatchObject({ type: "COMPLETE", answer: 6 });
   });
 
   it("runs a compiled functional specification through the generic top-down session path", () => {

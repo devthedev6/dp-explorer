@@ -32,6 +32,11 @@ export interface DemoSession {
  */
 export function createDemoSession(template: RegisteredTemplate): DemoSession {
   const normalizedInput = normalizeInput(template.id, template.defaultInput);
+
+  if (template.executionModel === "propagation") {
+    return createPropagationProblemSpecSession(template.spec, normalizedInput);
+  }
+
   return createProblemSpecSession(template.spec, normalizedInput, "top-down");
 }
 

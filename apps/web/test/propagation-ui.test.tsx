@@ -5,12 +5,26 @@ import { describe, expect, it, vi } from "vitest";
 import { EventType, toStateKey, type PropagationExecutionTrace } from "@dp-explorer/core";
 import { createPlaybackController, type PlaybackFrame } from "@dp-explorer/playback";
 
+import { App } from "../src/App";
 import { DPTable } from "../src/dp-table";
 import { FrameDetails } from "../src/frame-details";
 import { PlaybackTimeline } from "../src/playback-timeline";
 import { PropagationTransitionView } from "../src/propagation-transition";
 
 describe("propagation frame UI", () => {
+  it("groups registered templates by execution model in the selector", () => {
+    render(<App />);
+
+    const select = screen.getByLabelText("Template");
+    const functionalGroup = select.querySelector('optgroup[label="Functional DP"]');
+    const propagationGroup = select.querySelector('optgroup[label="Propagation DP"]');
+
+    expect(functionalGroup?.querySelector('option[value="fibonacci"]')).not.toBeNull();
+    expect(
+      propagationGroup?.querySelector('option[value="grid-paths-propagation"]')
+    ).not.toBeNull();
+  });
+
   it("renders propagation dpSnapshot cells with source and updated target highlights", () => {
     const controller = createPlaybackController(createPropagationTrace());
     const frame = controller.seek(3);

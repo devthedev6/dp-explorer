@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { EventType, runBottomUp, runTopDown } from "@dp-explorer/core";
+import { EventType, PropagationRuntime, runBottomUp, runTopDown } from "@dp-explorer/core";
 
 import { coordinateKey, templateRegistry } from "../src";
 
 describe("templateRegistry", () => {
   it("executes every registered template in both engine modes", () => {
     for (const template of templateRegistry.list()) {
+      if (template.executionModel !== "functional") {
+        continue;
+      }
+
       const input = normalizeInput(template.id, template.defaultInput);
       const topDown = runTopDown(template.spec, input);
       const bottomUp = runBottomUp(template.spec, input);
@@ -15,6 +19,19 @@ describe("templateRegistry", () => {
       expect(bottomUp.trace.events.at(-1)).toMatchObject({ type: EventType.Complete });
       expect(topDown.dpTable.size).toBeGreaterThan(0);
       expect(bottomUp.dpTable.size).toBeGreaterThan(0);
+    }
+  });
+
+  it("executes every registered propagation template through the propagation runtime", () => {
+    for (const template of templateRegistry.list()) {
+      if (template.executionModel !== "propagation") {
+        continue;
+      }
+
+      const result = new PropagationRuntime().execute(template.spec, template.defaultInput);
+
+      expect(result.trace.events.at(-1)).toMatchObject({ type: EventType.Complete });
+      expect(result.dpTable.size).toBeGreaterThan(0);
     }
   });
 });

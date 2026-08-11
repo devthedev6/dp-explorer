@@ -5,4 +5,5 @@ export * from "./knapsack";
 export * from "./unique-paths-ii";
 export * from "./minimum-path-sum";
 export * from "./coin-change";
+export * from "./grid-paths-propagation";
 export * from "./registry";

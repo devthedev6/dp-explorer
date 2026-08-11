@@ -17,6 +17,7 @@ import "./App.css";
 
 const templates = templateRegistry.list();
 const firstTemplate = templates[0];
+const templateGroups = groupTemplatesByExecutionModel(templates);
 
 if (firstTemplate === undefined) {
   throw new Error("No templates are registered.");
@@ -184,10 +185,14 @@ export function App() {
             onChange={(event) => selectTemplate(event.target.value)}
             aria-label="Template"
           >
-            {templates.map((template) => (
-              <option key={template.id} value={template.id}>
-                {template.name}
-              </option>
+            {templateGroups.map((group) => (
+              <optgroup key={group.executionModel} label={group.label}>
+                {group.templates.map((template) => (
+                  <option key={template.id} value={template.id}>
+                    {template.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
             <option value="__custom_dp__">Custom DP (Experimental)</option>
           </select>
@@ -252,6 +257,37 @@ export function App() {
 
 function isFunctionalFrame(frame: PlaybackFrame): frame is ExecutionFrame {
   return "callStack" in frame;
+}
+
+function groupTemplatesByExecutionModel(templateList: readonly RegisteredTemplate[]) {
+  const labels: Record<RegisteredTemplate["executionModel"], string> = {
+    functional: "Functional DP",
+    propagation: "Propagation DP"
+  };
+  const groups = new Map<
+    RegisteredTemplate["executionModel"],
+    {
+      executionModel: RegisteredTemplate["executionModel"];
+      label: string;
+      templates: RegisteredTemplate[];
+    }
+  >();
+
+  for (const template of templateList) {
+    const existingGroup = groups.get(template.executionModel);
+
+    if (existingGroup) {
+      existingGroup.templates.push(template);
+    } else {
+      groups.set(template.executionModel, {
+        executionModel: template.executionModel,
+        label: labels[template.executionModel],
+        templates: [template]
+      });
+    }
+  }
+
+  return Array.from(groups.values());
 }
 
 interface InputFieldControlProps {

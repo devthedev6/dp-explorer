@@ -3,9 +3,12 @@ import {
   FunctionalRuntime,
   type FunctionalExecutionMode,
   type FunctionalProblemSpec,
+  type PropagationProblemSpec,
+  PropagationRuntime,
+  type PropagationTraceEvent,
   type TraceEvent
 } from "@dp-explorer/core";
-import type { ExecutionFrame, PlaybackController } from "@dp-explorer/playback";
+import type { PlaybackController, PlaybackFrame } from "@dp-explorer/playback";
 import { createPlaybackController } from "@dp-explorer/playback";
 import type { RegisteredTemplate } from "@dp-explorer/templates";
 import { coordinateKey } from "@dp-explorer/templates";
@@ -13,12 +16,12 @@ import { coordinateKey } from "@dp-explorer/templates";
 export type RuntimeExecutionMode = FunctionalExecutionMode;
 
 export interface DemoSession {
-  readonly controller: PlaybackController;
+  readonly controller: PlaybackController<PlaybackFrame>;
   readonly answer: number;
-  currentFrame(): ExecutionFrame;
-  next(): ExecutionFrame;
-  previous(): ExecutionFrame;
-  reset(): ExecutionFrame;
+  currentFrame(): PlaybackFrame;
+  next(): PlaybackFrame;
+  previous(): PlaybackFrame;
+  reset(): PlaybackFrame;
 }
 
 /**
@@ -51,7 +54,25 @@ export function createProblemSpecSession<Input>(
   });
 }
 
-function readCompleteAnswer(events: readonly TraceEvent[]): number {
+export function createPropagationProblemSpecSession<Input>(
+  spec: PropagationProblemSpec<Input>,
+  input: Input
+): DemoSession {
+  const result = new PropagationRuntime<Input>().execute(spec, input);
+  const controller = createPlaybackController(result.trace);
+  const answer = readCompleteAnswer(result.trace.events);
+
+  return Object.freeze({
+    controller,
+    answer,
+    currentFrame: () => controller.currentFrame(),
+    next: () => controller.next(),
+    previous: () => controller.previous(),
+    reset: () => controller.seek(0)
+  });
+}
+
+function readCompleteAnswer(events: readonly (TraceEvent | PropagationTraceEvent)[]): number {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const event = events[index];
     if (event?.type === EventType.Complete) {

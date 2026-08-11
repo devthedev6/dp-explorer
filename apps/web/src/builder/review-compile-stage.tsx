@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { type InputField } from "@dp-explorer/core";
-import type { ExecutionFrame } from "@dp-explorer/playback";
+import type { ExecutionFrame, PlaybackFrame } from "@dp-explorer/playback";
 import {
   compileSpecification,
   createDefaultRuntimeInputText,
@@ -13,6 +13,7 @@ import { DPTable } from "../dp-table";
 import { createProblemSpecSession, type DemoSession } from "../demo-session";
 import { FrameDetails } from "../frame-details";
 import { PlaybackTimeline } from "../playback-timeline";
+import { PropagationTransitionView } from "../propagation-transition";
 import { RecursionTreeView } from "../recursion-tree";
 import type { BuilderSymbol } from "./builder-state";
 import { useBuilderCompilation, useBuilderDispatch, useBuilderState } from "./builder-store";
@@ -21,7 +22,7 @@ type RuntimeInputText = Record<string, string>;
 
 interface ExecutionViewState {
   readonly session: DemoSession;
-  readonly frame: ExecutionFrame;
+  readonly frame: PlaybackFrame;
 }
 
 function formatDiagnosticPath(path: readonly (string | number)[] | undefined): string | null {
@@ -110,7 +111,7 @@ export function ReviewCompileStage() {
     }
   }
 
-  function setFrame(frame: ExecutionFrame) {
+  function setFrame(frame: PlaybackFrame) {
     setExecution((current) => (current ? { ...current, frame } : current));
   }
 
@@ -191,7 +192,11 @@ export function ReviewCompileStage() {
               </section>
               <section className="builder-playback" aria-label="Compiled specification playback">
                 <section className="builder-playback-tree" aria-label="Recursion tree">
-                  <RecursionTreeView frame={execution.frame} />
+                  {isFunctionalFrame(execution.frame) ? (
+                    <RecursionTreeView frame={execution.frame} />
+                  ) : (
+                    <PropagationTransitionView frame={execution.frame} />
+                  )}
                 </section>
                 <section className="builder-playback-table" aria-label="DP table">
                   <DPTable frame={execution.frame} />
@@ -235,6 +240,10 @@ export function ReviewCompileStage() {
       )}
     </div>
   );
+}
+
+function isFunctionalFrame(frame: PlaybackFrame): frame is ExecutionFrame {
+  return "callStack" in frame;
 }
 
 interface RuntimeInputControlProps {

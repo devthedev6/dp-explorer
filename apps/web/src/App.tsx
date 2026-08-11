@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ExecutionFrame } from "@dp-explorer/playback";
+import type { ExecutionFrame, PlaybackFrame } from "@dp-explorer/playback";
 import type { AlgorithmFormulation, InputField } from "@dp-explorer/core";
 import type { RegisteredTemplate } from "@dp-explorer/templates";
 import { templateRegistry } from "@dp-explorer/templates";
@@ -8,6 +8,7 @@ import { createDemoSession } from "./demo-session";
 import { FrameDetails } from "./frame-details";
 import { PlaybackTimeline } from "./playback-timeline";
 import { DPTable } from "./dp-table";
+import { PropagationTransitionView } from "./propagation-transition";
 import { RecursionTreeView } from "./recursion-tree";
 import { SpecificationBuilderPage } from "./builder";
 
@@ -29,7 +30,7 @@ export function App() {
     ...defaultTemplate.defaultInput
   }));
   const [session, setSession] = useState(() => createDemoSession(defaultTemplate));
-  const [frame, setFrame] = useState<ExecutionFrame>(() => session.currentFrame());
+  const [frame, setFrame] = useState<PlaybackFrame>(() => session.currentFrame());
   const selectedTemplate = templateRegistry.get(selectedTemplateId) ?? defaultTemplate;
 
   function isGridTemplateId(templateId: string): boolean {
@@ -205,7 +206,8 @@ export function App() {
       </header>
 
       <section className="app-recursion-tree" aria-label="Recursion tree">
-        <RecursionTreeView frame={frame} />
+        {isFunctionalFrame(frame) ? <RecursionTreeView frame={frame} /> : null}
+        <PropagationTransitionView frame={frame} />
       </section>
 
       <section className="app-table-column" aria-label="DP table">
@@ -240,6 +242,10 @@ export function App() {
       </section>
     </main>
   );
+}
+
+function isFunctionalFrame(frame: PlaybackFrame): frame is ExecutionFrame {
+  return "callStack" in frame;
 }
 
 interface InputFieldControlProps {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { templateRegistry } from "@dp-explorer/templates";
 import { compileSpecification } from "@dp-explorer/spec-compiler";
+import type { ExecutionFrame, PlaybackFrame } from "@dp-explorer/playback";
 
 import { createDemoSession, createProblemSpecSession } from "../src/demo-session";
 
@@ -129,7 +130,7 @@ function readFrameFacts(template: Parameters<typeof createDemoSession>[0]) {
       totalFrames: frame.totalFrames,
       eventType: frame.currentEvent.type,
       state: "state" in frame.currentEvent ? frame.currentEvent.state : null,
-      callStack: [...frame.callStack],
+      callStack: isFunctionalFrame(frame) ? [...frame.callStack] : [],
       dpSnapshot: Object.fromEntries(frame.dpSnapshot.entries())
     });
 
@@ -139,6 +140,10 @@ function readFrameFacts(template: Parameters<typeof createDemoSession>[0]) {
 
     frame = session.next();
   }
+}
+
+function isFunctionalFrame(frame: PlaybackFrame): frame is ExecutionFrame {
+  return "callStack" in frame;
 }
 
 function createCompiledFibonacciBuilderState(executionMode: "top-down" | "bottom-up") {

@@ -1,9 +1,9 @@
-import type { ExecutionFrame } from "@dp-explorer/playback";
+import type { PlaybackFrame } from "@dp-explorer/playback";
 
 import "./playback-timeline.css";
 
 export interface PlaybackTimelineProps {
-  readonly frame: ExecutionFrame;
+  readonly frame: PlaybackFrame;
   readonly onSeek: (frameIndex: number) => void;
 }
 

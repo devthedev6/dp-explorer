@@ -1,24 +1,26 @@
-import type { ExecutionFrame, HighlightRole } from "@dp-explorer/playback";
+import type { ExecutionFrame, HighlightRole, PlaybackFrame } from "@dp-explorer/playback";
 import { toStateKey } from "@dp-explorer/core";
 
 import "./dp-table.css";
 
 export interface DPTableProps {
-  readonly frame: ExecutionFrame;
+  readonly frame: PlaybackFrame;
 }
+
+type CellRole = HighlightRole | "updated" | "transition-target";
 
 interface CellViewModel {
   readonly state: string;
   readonly label: string;
   readonly value: number | null;
-  readonly role: HighlightRole | null;
+  readonly role: CellRole | null;
 }
 
 /**
  * Generic DP table renderer for 1D and 2D coordinate-vector state spaces.
  *
- * The component consumes only `ExecutionFrame`; dimensions, filled values, and
- * highlights are all provided by the Playback Engine through the frame.
+ * The component consumes only playback frame data; dimensions, filled values,
+ * and highlights are all provided by the Playback Engine through the frame.
  */
 export function DPTable({ frame }: DPTableProps) {
   const dimensions = frame.table.dimensions;
@@ -141,6 +143,8 @@ function DPTableLegend() {
   return (
     <ul className="dp-table-legend" aria-label="DP table legend">
       <LegendItem label="Active" role="active" />
+      <LegendItem label="Updated" role="updated" />
+      <LegendItem label="Transition Target" role="transition-target" />
       <LegendItem label="Dependency" role="dependency" />
       <LegendItem label="Base Case" role="base-case" />
       <LegendItem label="Memo Hit" role="memo-hit" />
@@ -158,7 +162,7 @@ function LegendItem({ label, role }: { readonly label: string; readonly role: st
   );
 }
 
-function cellFor(frame: ExecutionFrame, coordinates: readonly number[]): CellViewModel {
+function cellFor(frame: PlaybackFrame, coordinates: readonly number[]): CellViewModel {
   const state = toStateKey(coordinates);
   return {
     state,
@@ -168,7 +172,15 @@ function cellFor(frame: ExecutionFrame, coordinates: readonly number[]): CellVie
   };
 }
 
-function roleFor(frame: ExecutionFrame, state: string): HighlightRole | null {
+function roleFor(frame: PlaybackFrame, state: string): CellRole | null {
+  if (isPropagationFrame(frame)) {
+    if (frame.updatedState?.state === state) return "updated";
+    if (frame.activeTransition?.source === state) return "active";
+    if (frame.processedState === state) return "active";
+    if (frame.activeTransition?.target === state) return "transition-target";
+    return null;
+  }
+
   const roles = frame.highlightedCells
     .filter((cell) => cell.state === state)
     .map((cell) => cell.role);
@@ -178,6 +190,10 @@ function roleFor(frame: ExecutionFrame, state: string): HighlightRole | null {
   if (roles.includes("memo-hit")) return "memo-hit";
   if (roles.includes("dependency")) return "dependency";
   return null;
+}
+
+function isPropagationFrame(frame: PlaybackFrame): frame is Exclude<PlaybackFrame, ExecutionFrame> {
+  return "processedState" in frame;
 }
 
 function formatCoordinates(coordinates: readonly number[]): string {

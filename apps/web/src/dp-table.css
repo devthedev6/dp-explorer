@@ -65,6 +65,20 @@
   background: #38bdf8;
 }
 
+.dp-table-cell[data-role="updated"] {
+  color: #052e16;
+  background: #86efac;
+  outline: 3px solid #facc15;
+  outline-offset: -3px;
+}
+
+.dp-table-cell[data-role="transition-target"] {
+  color: #0f172a;
+  background: #67e8f9;
+  outline: 2px dashed #facc15;
+  outline-offset: -4px;
+}
+
 .dp-table-cell[data-role="base-case"] {
   color: #0f172a;
   background: #22c55e;
@@ -111,6 +125,16 @@
 
 .dp-table-legend-swatch[data-role="dependency"] {
   background: #38bdf8;
+}
+
+.dp-table-legend-swatch[data-role="updated"] {
+  background: #86efac;
+  border: 2px solid #facc15;
+}
+
+.dp-table-legend-swatch[data-role="transition-target"] {
+  background: #67e8f9;
+  border: 1px dashed #facc15;
 }
 
 .dp-table-legend-swatch[data-role="base-case"] {

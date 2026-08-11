@@ -11,6 +11,10 @@
   margin: 0 0 20px;
 }
 
+.frame-details .frame-details-nested {
+  margin-bottom: 0;
+}
+
 .frame-details dt {
   font-weight: 600;
   color: #374151;

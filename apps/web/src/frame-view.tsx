@@ -1,16 +1,17 @@
-import type { ExecutionFrame } from "@dp-explorer/playback";
+import type { ExecutionFrame, PlaybackFrame } from "@dp-explorer/playback";
 
 import { DPTable } from "./dp-table";
+import { PropagationTransitionView } from "./propagation-transition";
 import { RecursionTreeView } from "./recursion-tree";
 
 export interface FrameViewProps {
-  readonly frame: ExecutionFrame;
+  readonly frame: PlaybackFrame;
 }
 
 /**
  * Minimal frame renderer for the shell milestone.
  *
- * It consumes only `ExecutionFrame` data and never reads the underlying trace.
+ * It consumes only playback frame data and never reads the underlying trace.
  */
 export function FrameView({ frame }: FrameViewProps) {
   return (
@@ -35,16 +36,20 @@ export function FrameView({ frame }: FrameViewProps) {
       <section>
         <h2>Call stack</h2>
         <ul data-testid="call-stack">
-          {frame.callStack.length === 0 ? (
+          {isFunctionalFrame(frame) && frame.callStack.length === 0 ? (
             <li>Empty</li>
-          ) : (
+          ) : isFunctionalFrame(frame) ? (
             frame.callStack.map((state, index) => <li key={`${state}-${index}`}>{state}</li>)
+          ) : (
+            <li>Not available for propagation</li>
           )}
         </ul>
       </section>
 
+      <section>{isFunctionalFrame(frame) ? <RecursionTreeView frame={frame} /> : null}</section>
+
       <section>
-        <RecursionTreeView frame={frame} />
+        <PropagationTransitionView frame={frame} />
       </section>
 
       <section>
@@ -54,6 +59,13 @@ export function FrameView({ frame }: FrameViewProps) {
   );
 }
 
-function readCurrentState(frame: ExecutionFrame): string | null {
-  return "state" in frame.currentEvent ? frame.currentEvent.state : null;
+function readCurrentState(frame: PlaybackFrame): string | null {
+  const event = frame.currentEvent;
+  if ("state" in event) return event.state;
+  if ("source" in event) return event.source;
+  return null;
+}
+
+function isFunctionalFrame(frame: PlaybackFrame): frame is ExecutionFrame {
+  return "callStack" in frame;
 }
